@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-15
+
+### Added
+
+- **`mcp-signal/inline` entry** — first-class helpers for MCP servers that inline the SDK into
+  server-rendered widget HTML. `injectSignal(html, config)` splices the standalone IIFE plus a
+  `createSignal(...)` bootstrap into a widget document in one call (index-based insert before
+  `</head>`/`</body>`, `</script>` defused); `renderInlineScript(config)` returns just the `<script>`
+  tag; and `source` exposes the built IIFE as a bundler-safe string. Adapters are described
+  declaratively (`bridge` / `webhook` / `posthog` / `console`) and constructed inside the widget, since
+  live adapter objects can't cross into an HTML string. Removes the need for consumers to vendor the
+  IIFE themselves. The embedded `source` is spliced into `dist/` at build time (`postbuild`), so nothing
+  generated is committed.
+
 ## [0.1.1] - 2026-07-15
 
 Documentation and repository polish. **No code changes** — the published SDK is identical to

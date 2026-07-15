@@ -66,7 +66,9 @@ npm install mcp-signal
 ```
 
 Usable from TypeScript or plain JS. For a raw-HTML (`srcdoc`) widget with no bundler, you can also
-inline the standalone build — see [docs/setup.md](./docs/setup.md).
+inline the standalone build — see [docs/setup.md](./docs/setup.md). If your **MCP server** renders the
+widget HTML, `mcp-signal/inline` does the inlining for you in one call
+(`injectSignal(html, { bridge: { toolName } })`) — no vendoring, no bundler config.
 
 ## Quickstart
 
@@ -211,7 +213,7 @@ documented contract — see [docs/writing-an-adapter.md](./docs/writing-an-adapt
 | `requestTimeoutMs`             | `8000`               | Per in-session send timeout.                            |
 | `retry`                        | `{maxRetries:3,…}`   | Exponential backoff for in-session sends.               |
 | `beforeSend`                   | —                    | `(event) => event \| null` — redact or drop.            |
-| `context`                      | —                    | Static properties merged into every event's context.   |
+| `context`                      | —                    | Static properties merged into every event's context.    |
 | `sessionId`                    | auto                 | Override the session id.                                |
 | `host`                         | auto                 | Override host detection.                                |
 | `debug`                        | `false`              | Verbose logs + CSP diagnostics.                         |

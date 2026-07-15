@@ -67,8 +67,15 @@ interface Adapter {
 - **`src/server.ts`** → node entry (`mcp-signal/server`): `createSignalReceiver`,
   `signalToolDefinition`, and the destination adapters for server-side use. **Never import this into
   the widget**; it must not touch `window`.
+- **`src/inline.ts`** → server/build-time entry (`mcp-signal/inline`): `source` (the IIFE as a
+  string), `renderInlineScript`, `injectSignal` — for MCP servers that inline the SDK into
+  server-rendered widget HTML. Pure string work; no `window`/`fs`/`Buffer`. `source` is a placeholder
+  (`__MCP_SIGNAL_IIFE_PLACEHOLDER__`) in `src`; `scripts/embed-inline-source.mjs` splices the built
+  IIFE into `dist/inline.{js,cjs}` via the `postbuild` npm step (nothing generated is committed — `dist`
+  is gitignored).
 - Keep server code out of the widget bundle: `src/index.ts` must not import `receiver`/`tool-def`.
-  Verify after a build: `grep -c createSignalReceiver dist/mcp-signal.global.js` → `0`.
+  Verify after a build: `grep -c createSignalReceiver dist/mcp-signal.global.js` → `0` (and the same
+  for `dist/inline.js`, which embeds only the browser IIFE).
 
 ## Invariants (do not break)
 

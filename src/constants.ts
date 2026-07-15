@@ -56,3 +56,10 @@ export const BRIDGE_DEFAULT_TOOL = 'record_signal';
 
 /** Default attribute the interaction capture looks for. */
 export const DEFAULT_INTERACTION_ATTR = 'data-mcp-signal';
+
+/**
+ * Global the standalone IIFE build assigns to `window` (`window.McpSignal`). Single
+ * source of truth for the name — the `mcp-signal/inline` entry reads it to generate the
+ * widget bootstrap, and `tsup.config.ts`'s `globalName` must match it.
+ */
+export const IIFE_GLOBAL = 'McpSignal';

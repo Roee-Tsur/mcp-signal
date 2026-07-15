@@ -1,6 +1,6 @@
 {
   "name": "mcp-signal",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Tiny, zero-dependency, pluggable telemetry SDK for MCP widgets (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui). Capture lifecycle, custom, and error events and forward them to any analytics destination.",
   "keywords": [
     "mcp",
@@ -53,6 +53,11 @@
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
     },
+    "./inline": {
+      "types": "./dist/inline.d.ts",
+      "import": "./dist/inline.js",
+      "require": "./dist/inline.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -66,6 +71,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "postbuild": "node scripts/embed-inline-source.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

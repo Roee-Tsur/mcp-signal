@@ -29,6 +29,25 @@ import { createSignal, bridgeAdapter } from 'mcp-signal';
 </script>
 ```
 
+**Server-rendered widget (`mcp-signal/inline`).** If your MCP server returns the widget HTML, let the
+package inline the SDK for you — no copy-paste, no vendoring, no bundler config. `injectSignal` splices
+the standalone build plus a `createSignal(...)` bootstrap into your HTML:
+
+```ts
+import { injectSignal } from 'mcp-signal/inline';
+
+const html = injectSignal(widgetHtml, {
+  widgetName: 'weather',
+  bridge: { toolName: 'record_signal' }, // CSP-free; see Transport A
+  autoCaptureInteractions: true,
+});
+```
+
+Adapters are described declaratively (`bridge` / `webhook` / `posthog` / `console`) and constructed
+inside the widget — `bridge` is the CSP-free default; `webhook`/`posthog` POST directly and need the
+host to allowlist their origin. Two lower-level exports are available if you want to place the script
+yourself: `source` (the raw IIFE string) and `renderInlineScript(config)` (the ready `<script>` tag).
+
 ---
 
 ## Transport A — bridge (recommended)
