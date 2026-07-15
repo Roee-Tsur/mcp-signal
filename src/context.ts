@@ -1,6 +1,6 @@
 import { SDK_NAME, SDK_VERSION } from './constants';
 import { uuid } from './ids';
-import type { HostEnv, TelemetryConfig, TelemetryContext } from './types';
+import type { HostEnv, SignalConfig, SignalContext } from './types';
 
 /**
  * The subset of ChatGPT's injected `window.openai` global we read. Everything is
@@ -32,7 +32,7 @@ export function detectHost(configHost?: HostEnv): HostEnv {
   return 'unknown';
 }
 
-function resolveSessionId(config: TelemetryConfig): string {
+function resolveSessionId(config: SignalConfig): string {
   if (config.sessionId) return config.sessionId;
   const sid = getOpenAi()?.toolResponseMetadata?._meta?.['openai/widgetSessionId'];
   if (typeof sid === 'string' && sid.length > 0) return sid;
@@ -76,8 +76,8 @@ function detectViewport(): { width: number; height: number } | undefined {
 }
 
 /** Build the context snapshot for this widget load. Pure and side-effect free. */
-export function resolveContext(config: TelemetryConfig): TelemetryContext {
-  const ctx: TelemetryContext = {
+export function resolveContext(config: SignalConfig): SignalContext {
+  const ctx: SignalContext = {
     sessionId: resolveSessionId(config),
     host: detectHost(config.host),
     sdk: { name: SDK_NAME, version: SDK_VERSION },
@@ -105,7 +105,7 @@ export function resolveContext(config: TelemetryConfig): TelemetryContext {
  * Mutates the passed context object in place (new events snapshot it by copy).
  * Returns an uninstall function.
  */
-export function installContextRefresh(ctx: TelemetryContext): () => void {
+export function installContextRefresh(ctx: SignalContext): () => void {
   if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') {
     return () => {};
   }

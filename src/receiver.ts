@@ -1,17 +1,17 @@
-import type { Adapter, TelemetryEvent } from './types';
+import type { Adapter, SignalEvent } from './types';
 
-export interface TelemetryReceiverConfig {
+export interface SignalReceiverConfig {
   /** Destination adapters run server-side (PostHog, webhook, console, custom). */
   adapters: Adapter[];
   /** Redact or drop each event server-side. Return `null` to drop. */
-  beforeSend?: (event: TelemetryEvent) => TelemetryEvent | null;
+  beforeSend?: (event: SignalEvent) => SignalEvent | null;
 }
 
 export interface IngestResult {
   accepted: number;
 }
 
-export interface TelemetryReceiver {
+export interface SignalReceiver {
   /** Ingest a bridge payload (`{ events: [...] }`) or a raw event array. */
   ingest(payload: unknown): Promise<IngestResult>;
   /**
@@ -23,11 +23,11 @@ export interface TelemetryReceiver {
   ): Promise<{ content: Array<{ type: 'text'; text: string }>; structuredContent: IngestResult }>;
 }
 
-function extractEvents(payload: unknown): TelemetryEvent[] {
-  if (Array.isArray(payload)) return payload as TelemetryEvent[];
+function extractEvents(payload: unknown): SignalEvent[] {
+  if (Array.isArray(payload)) return payload as SignalEvent[];
   if (payload && typeof payload === 'object') {
     const events = (payload as { events?: unknown }).events;
-    if (Array.isArray(events)) return events as TelemetryEvent[];
+    if (Array.isArray(events)) return events as SignalEvent[];
   }
   return [];
 }
@@ -38,9 +38,9 @@ function extractEvents(payload: unknown): TelemetryEvent[] {
  * — the one adapter contract, reused where there is no CSP/CORS constraint. Adapter
  * errors are isolated so one failing destination never fails the whole ingest.
  */
-export function createTelemetryReceiver(config: TelemetryReceiverConfig): TelemetryReceiver {
+export function createSignalReceiver(config: SignalReceiverConfig): SignalReceiver {
   if (!config.adapters || config.adapters.length === 0) {
-    throw new Error('createTelemetryReceiver: at least one adapter is required');
+    throw new Error('createSignalReceiver: at least one adapter is required');
   }
 
   async function ingest(payload: unknown): Promise<IngestResult> {
@@ -49,7 +49,7 @@ export function createTelemetryReceiver(config: TelemetryReceiverConfig): Teleme
       const beforeSend = config.beforeSend;
       events = events
         .map((event) => beforeSend(event))
-        .filter((event): event is TelemetryEvent => event !== null && event !== undefined);
+        .filter((event): event is SignalEvent => event !== null && event !== undefined);
     }
     if (events.length === 0) return { accepted: 0 };
     await Promise.allSettled(

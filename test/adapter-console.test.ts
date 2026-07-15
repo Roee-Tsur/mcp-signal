@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { consoleAdapter } from '../src/adapters/console';
-import type { TelemetryEvent } from '../src/types';
+import type { SignalEvent } from '../src/types';
 
-function event(name: string, props: Record<string, unknown> = {}): TelemetryEvent {
+function event(name: string, props: Record<string, unknown> = {}): SignalEvent {
   return {
     event: name,
     properties: props,
@@ -11,7 +11,7 @@ function event(name: string, props: Record<string, unknown> = {}): TelemetryEven
     context: {
       sessionId: 's',
       host: 'browser',
-      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+      sdk: { name: 'mcp-signal', version: '0' },
     },
   };
 }
@@ -45,7 +45,7 @@ describe('consoleAdapter', () => {
     adapter.init?.({
       sessionId: 's',
       host: 'browser',
-      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+      sdk: { name: 'mcp-signal', version: '0' },
     });
     expect(logger.log).toHaveBeenCalled();
     expect(adapter.connectDomains).toEqual([]);

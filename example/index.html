@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>mcp-widget-telemetry demo</title>
+    <title>mcp-signal demo</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -156,7 +156,7 @@
   </head>
   <body>
     <main>
-      <h1>mcp-widget-telemetry</h1>
+      <h1>mcp-signal</h1>
       <p class="sub">
         A live demo of the SDK running in a page. Click the buttons — events are captured and sent
         through <strong>two transports at once</strong>, then echoed back below. Open your browser
@@ -166,15 +166,15 @@
       <div class="card">
         <h2>Do something in the "widget"</h2>
         <div class="actions">
-          <button class="primary" data-mcp-tel="expand_forecast" id="a1">Expand forecast</button>
-          <button data-mcp-tel="open_settings" id="a2">Open settings</button>
+          <button class="primary" data-mcp-signal="expand_forecast" id="a1">Expand forecast</button>
+          <button data-mcp-signal="open_settings" id="a2">Open settings</button>
           <button id="a3">Track custom event</button>
           <button id="a4">Submit a form</button>
           <button class="danger" id="a5">Throw an error</button>
           <button id="a6">Flush now</button>
         </div>
         <p class="legend" style="margin-top: 14px">
-          The first two buttons carry <code>data-mcp-tel</code> and are captured automatically.
+          The first two buttons carry <code>data-mcp-signal</code> and are captured automatically.
           Lifecycle events (<code>loaded</code>, <code>visible</code>) and uncaught errors are
           captured with no code at all.
         </p>
@@ -185,7 +185,7 @@
         <p class="legend">
           <span class="dot direct"></span> Direct transport (webhook adapter →
           <code>/webhook</code>) &nbsp;&nbsp; <span class="dot bridge"></span> Bridge transport
-          (tool call → <code>/tool/record_telemetry</code> → receiver)
+          (tool call → <code>/tool/record_signal</code> → receiver)
         </p>
         <div class="cols" style="margin-top: 12px">
           <div>
@@ -200,10 +200,9 @@
       </div>
     </main>
 
-    <script src="/mcp-widget-telemetry.global.js"></script>
+    <script src="/mcp-signal.global.js"></script>
     <script>
-      const { createTelemetry, consoleAdapter, webhookAdapter, bridgeAdapter } =
-        window.McpTelemetry;
+      const { createSignal, consoleAdapter, webhookAdapter, bridgeAdapter } = window.McpSignal;
 
       // The bridge transport hands each batch to an app-only MCP tool. In a real widget the host
       // provides window.openai.callTool (ChatGPT) or a tools/call postMessage (MCP Apps). Here we
@@ -217,29 +216,29 @@
         return res.json();
       }
 
-      const telemetry = createTelemetry({
+      const signal = createSignal({
         widgetName: 'demo-weather',
         widgetVersion: '0.1.0',
         debug: true,
-        autoCaptureInteractions: true, // capture clicks on [data-mcp-tel] elements
+        autoCaptureInteractions: true, // capture clicks on [data-mcp-signal] elements
         flushIntervalMs: 2000,
         adapters: [
           consoleAdapter(), // always works — see your browser console
           webhookAdapter({ url: '/webhook' }), // DIRECT transport
-          bridgeAdapter({ toolName: 'record_telemetry', callTool: demoCallTool }), // BRIDGE transport
+          bridgeAdapter({ toolName: 'record_signal', callTool: demoCallTool }), // BRIDGE transport
         ],
       });
 
       document.getElementById('a3').addEventListener('click', () => {
-        telemetry.track('custom_event', { source: 'demo', value: Math.round(Math.random() * 100) });
+        signal.track('custom_event', { source: 'demo', value: Math.round(Math.random() * 100) });
       });
       document.getElementById('a4').addEventListener('click', () => {
-        telemetry.track('form_submitted', { fields: 3, valid: true });
+        signal.track('form_submitted', { fields: 3, valid: true });
       });
       document.getElementById('a5').addEventListener('click', () => {
         throw new Error('demo error thrown inside the widget');
       });
-      document.getElementById('a6').addEventListener('click', () => telemetry.flush());
+      document.getElementById('a6').addEventListener('click', () => signal.flush());
 
       // Poll the server and render what it received, split by transport.
       const render = (listId, items) => {

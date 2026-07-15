@@ -1,6 +1,6 @@
-# mcp-widget-telemetry
+# mcp-signal
 
-[![npm](https://img.shields.io/npm/v/mcp-widget-telemetry.svg)](https://www.npmjs.com/package/mcp-widget-telemetry)
+[![npm](https://img.shields.io/npm/v/mcp-signal.svg)](https://www.npmjs.com/package/mcp-signal)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](./package.json)
 [![types](https://img.shields.io/badge/types-included-blue.svg)](./dist/index.d.ts)
@@ -10,14 +10,14 @@ drop into an interactive MCP widget (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui) 
 forward it to any analytics destination — PostHog, a webhook, your console, or an adapter you write.
 
 ```js
-import { createTelemetry, consoleAdapter } from 'mcp-widget-telemetry';
+import { createSignal, consoleAdapter } from 'mcp-signal';
 
-const telemetry = createTelemetry({
+const signal = createSignal({
   widgetName: 'weather',
   adapters: [consoleAdapter()],
 });
 
-telemetry.track('forecast_expanded', { day: 'tue' });
+signal.track('forecast_expanded', { day: 'tue' });
 ```
 
 That's a working first event. Swap `consoleAdapter()` for a real destination when you're ready.
@@ -31,7 +31,7 @@ or ChatGPT. If you build one, you're flying blind: does it load? which controls 
 people drop off? what errors happen inside that sandboxed iframe? Regular web-analytics snippets
 don't work cleanly in these sandboxes, and there's no standard instrumentation story.
 
-`mcp-widget-telemetry` fills the gap with three ideas:
+`mcp-signal` fills the gap with three ideas:
 
 - **A pluggable adapter contract.** The core doesn't know about any vendor. You plug in a
   destination; the community can write more. Two ship in v0.1 (PostHog + webhook) plus a console
@@ -51,7 +51,7 @@ It's neutral plumbing: **no phone-home, no collection of its own.** You decide w
 ## Install
 
 ```bash
-npm install mcp-widget-telemetry
+npm install mcp-signal
 ```
 
 Usable from TypeScript or plain JS. For a raw-HTML (`srcdoc`) widget with no bundler, you can also
@@ -64,9 +64,9 @@ inline the standalone build — see [docs/setup.md](./docs/setup.md).
 ### 1. See your first events (console — 30 seconds)
 
 ```js
-import { createTelemetry, consoleAdapter } from 'mcp-widget-telemetry';
+import { createSignal, consoleAdapter } from 'mcp-signal';
 
-const telemetry = createTelemetry({
+const signal = createSignal({
   widgetName: 'weather',
   widgetVersion: '1.0.0',
   adapters: [consoleAdapter()],
@@ -74,11 +74,11 @@ const telemetry = createTelemetry({
 
 // lifecycle + errors are captured automatically. Add your own:
 document.querySelector('#expand').addEventListener('click', () => {
-  telemetry.track('forecast_expanded', { day: 'tue' });
+  signal.track('forecast_expanded', { day: 'tue' });
 });
 ```
 
-Open the console — you'll see `mcp_widget_loaded` and every `track()` call.
+Open the console — you'll see `mcp_signal_loaded` and every `track()` call.
 
 ### 2. Ship to a real destination — the bridge (recommended)
 
@@ -88,40 +88,36 @@ your analytics key server-side.
 
 ```mermaid
 flowchart LR
-  W["widget<br/>bridgeAdapter"] -- "callTool('record_telemetry', …)" --> H[host]
-  H -- "tools/call" --> S["your MCP server<br/>createTelemetryReceiver"]
+  W["widget<br/>bridgeAdapter"] -- "callTool('record_signal', …)" --> H[host]
+  H -- "tools/call" --> S["your MCP server<br/>createSignalReceiver"]
   S -- "server-side POST" --> D[(PostHog / webhook)]
 ```
 
 **In your widget:**
 
 ```js
-import { createTelemetry, bridgeAdapter } from 'mcp-widget-telemetry';
+import { createSignal, bridgeAdapter } from 'mcp-signal';
 
-const telemetry = createTelemetry({
+const signal = createSignal({
   widgetName: 'weather',
-  adapters: [bridgeAdapter({ toolName: 'record_telemetry' })],
+  adapters: [bridgeAdapter({ toolName: 'record_signal' })],
 });
 ```
 
 **On your MCP server** (register one tool — the package hands you the descriptor):
 
 ```js
-import {
-  createTelemetryReceiver,
-  posthogAdapter,
-  telemetryToolDefinition,
-} from 'mcp-widget-telemetry/server';
+import { createSignalReceiver, posthogAdapter, signalToolDefinition } from 'mcp-signal/server';
 
-const receiver = createTelemetryReceiver({
+const receiver = createSignalReceiver({
   adapters: [posthogAdapter({ apiKey: process.env.POSTHOG_KEY, host: 'eu' })],
 });
 
-const tool = telemetryToolDefinition(); // app-only, model-invisible, read-only
+const tool = signalToolDefinition(); // app-only, model-invisible, read-only
 server.registerTool(tool.name, tool, (args) => receiver.handleToolCall(args));
 ```
 
-`telemetryToolDefinition()` sets `_meta.ui.visibility: ["app"]` (the model never sees the tool — zero
+`signalToolDefinition()` sets `_meta.ui.visibility: ["app"]` (the model never sees the tool — zero
 context cost) and `readOnlyHint: true` (silent on ChatGPT, first-use-then-remembered on Claude). Full
 walkthrough incl. `@modelcontextprotocol/ext-apps`: [docs/setup.md](./docs/setup.md) ·
 [docs/bridge.md](./docs/bridge.md).
@@ -129,9 +125,9 @@ walkthrough incl. `@modelcontextprotocol/ext-apps`: [docs/setup.md](./docs/setup
 ### 3. Or send direct from the widget (you control the CSP)
 
 ```js
-import { createTelemetry, posthogAdapter } from 'mcp-widget-telemetry';
+import { createSignal, posthogAdapter } from 'mcp-signal';
 
-const telemetry = createTelemetry({
+const signal = createSignal({
   adapters: [posthogAdapter({ apiKey: 'phc_public_key', host: 'eu' })],
 });
 ```
@@ -140,7 +136,7 @@ Direct HTTP only leaves the widget if you **allowlist the destination** in your 
 package generates it for you:
 
 ```js
-import { cspMeta } from 'mcp-widget-telemetry';
+import { cspMeta } from 'mcp-signal';
 cspMeta([posthogAdapter({ apiKey: 'phc_x', host: 'eu' })]);
 // => { ui: { csp: { connectDomains: ['https://eu.i.posthog.com'] } } }
 ```
@@ -151,15 +147,15 @@ See the honest trade-offs in [Limitations](./docs/limitations.md).
 
 ## What gets captured
 
-| Event                    | When                                         |
-| ------------------------ | -------------------------------------------- |
-| `mcp_widget_loaded`      | SDK initializes                              |
-| `mcp_widget_visible`     | widget becomes visible                       |
-| `mcp_widget_hidden`      | widget is hidden (also flushes)              |
-| `mcp_widget_closed`      | widget is torn down (`pagehide`)             |
-| `mcp_widget_error`       | uncaught error / unhandled rejection         |
-| `mcp_widget_interaction` | click on a `[data-mcp-tel]` element (opt-in) |
-| _(your name)_            | every `track(name, props)` call              |
+| Event                    | When                                            |
+| ------------------------ | ----------------------------------------------- |
+| `mcp_signal_loaded`      | SDK initializes                                 |
+| `mcp_signal_visible`     | widget becomes visible                          |
+| `mcp_signal_hidden`      | widget is hidden (also flushes)                 |
+| `mcp_signal_closed`      | widget is torn down (`pagehide`)                |
+| `mcp_signal_error`       | uncaught error / unhandled rejection            |
+| `mcp_signal_interaction` | click on a `[data-mcp-signal]` element (opt-in) |
+| _(your name)_            | every `track(name, props)` call                 |
 
 Every event carries a best-effort **context**: widget name/version, an anonymous per-load
 `sessionId`, detected host, theme, locale, display mode, timezone, and viewport — only where reliably
@@ -170,8 +166,8 @@ obtainable, and never any user identity. See [Privacy & data](./docs/privacy.md)
 ## Try the demo
 
 ```bash
-git clone https://github.com/Roee-Tsur/mcp-widget-telemetry
-cd mcp-widget-telemetry
+git clone https://github.com/Roee-Tsur/mcp-signal
+cd mcp-signal
 npm install
 npm run example        # builds, then serves http://localhost:8787
 ```
@@ -183,13 +179,13 @@ and in your terminal. See [example/README.md](./example/README.md).
 
 ## Adapters
 
-| Adapter                                 | Package                       | Purpose                                  |
-| --------------------------------------- | ----------------------------- | ---------------------------------------- |
-| `consoleAdapter()`                      | `mcp-widget-telemetry`        | Local dev; always works under any CSP    |
-| `webhookAdapter({ url })`               | `mcp-widget-telemetry`        | POST batches to any URL                  |
-| `posthogAdapter({ apiKey, host })`      | `mcp-widget-telemetry`        | PostHog Cloud (US/EU) or self-hosted     |
-| `bridgeAdapter({ toolName })`           | `mcp-widget-telemetry`        | Route via an MCP tool call (recommended) |
-| `createTelemetryReceiver({ adapters })` | `mcp-widget-telemetry/server` | Server-side counterpart to the bridge    |
+| Adapter                              | Package             | Purpose                                  |
+| ------------------------------------ | ------------------- | ---------------------------------------- |
+| `consoleAdapter()`                   | `mcp-signal`        | Local dev; always works under any CSP    |
+| `webhookAdapter({ url })`            | `mcp-signal`        | POST batches to any URL                  |
+| `posthogAdapter({ apiKey, host })`   | `mcp-signal`        | PostHog Cloud (US/EU) or self-hosted     |
+| `bridgeAdapter({ toolName })`        | `mcp-signal`        | Route via an MCP tool call (recommended) |
+| `createSignalReceiver({ adapters })` | `mcp-signal/server` | Server-side counterpart to the bridge    |
 
 Full config for each is in [docs/adapters.md](./docs/adapters.md). Writing your own is a small,
 documented contract — see [docs/writing-an-adapter.md](./docs/writing-an-adapter.md).
@@ -198,7 +194,7 @@ documented contract — see [docs/writing-an-adapter.md](./docs/writing-an-adapt
 
 ## Configuration
 
-`createTelemetry(config)` options (all optional):
+`createSignal(config)` options (all optional):
 
 | Option                         | Default              | Description                                             |
 | ------------------------------ | -------------------- | ------------------------------------------------------- |

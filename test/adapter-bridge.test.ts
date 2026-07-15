@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { bridgeAdapter } from '../src/adapters/bridge';
 import { setOpenAi } from './helpers';
-import type { TelemetryEvent } from '../src/types';
+import type { SignalEvent } from '../src/types';
 
-function event(name: string): TelemetryEvent {
+function event(name: string): SignalEvent {
   return {
     event: name,
     properties: {},
@@ -12,7 +12,7 @@ function event(name: string): TelemetryEvent {
     context: {
       sessionId: 's',
       host: 'chatgpt',
-      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+      sdk: { name: 'mcp-signal', version: '0' },
     },
   };
 }
@@ -30,9 +30,9 @@ describe('bridgeAdapter', () => {
     await adapter.send([event('a')], { beacon: false });
     expect(callTool).toHaveBeenCalledTimes(1);
     const [name, args] = callTool.mock.calls[0];
-    expect(name).toBe('record_telemetry');
+    expect(name).toBe('record_signal');
     expect(args.events).toHaveLength(1);
-    expect((args.events as TelemetryEvent[])[0].event).toBe('a');
+    expect((args.events as SignalEvent[])[0].event).toBe('a');
     expect(args.sdk).toBeTruthy();
     expect(args.sentAt).toBeTruthy();
   });

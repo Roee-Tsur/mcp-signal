@@ -1,10 +1,10 @@
-// Zero-dependency demo server for mcp-widget-telemetry.
+// Zero-dependency demo server for mcp-signal.
 //
 // It plays three roles at once so you can watch events flow end-to-end in a plain browser:
 //   1. Static host      — serves the demo widget (index.html) and the built IIFE bundle.
 //   2. Webhook receiver  — POST /webhook           (the DIRECT transport lands here).
-//   3. MCP tool + server — POST /tool/record_telemetry (the BRIDGE transport lands here;
-//                          it runs the SAME destination adapters via createTelemetryReceiver,
+//   3. MCP tool + server — POST /tool/record_signal (the BRIDGE transport lands here;
+//                          it runs the SAME destination adapters via createSignalReceiver,
 //                          exactly like a real MCP server's app-only tool handler would).
 //
 // Run with:  npm run example   (builds the package first, then starts this server)
@@ -14,11 +14,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-import {
-  consoleAdapter,
-  createTelemetryReceiver,
-  telemetryToolDefinition,
-} from '../dist/server.js';
+import { consoleAdapter, createSignalReceiver, signalToolDefinition } from '../dist/server.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT ?? 8787);
@@ -48,12 +44,12 @@ const memoryAdapter = {
     for (const event of batch) record('bridge', event);
   },
 };
-const receiver = createTelemetryReceiver({
+const receiver = createSignalReceiver({
   adapters: [consoleAdapter({ label: '[server]' }), memoryAdapter],
 });
 
 // This is the descriptor a real MCP server would register (app-only, model-invisible).
-const tool = telemetryToolDefinition();
+const tool = signalToolDefinition();
 console.log(
   `\nRegistered app-only tool "${tool.name}" (visibility: ${JSON.stringify(tool._meta.ui.visibility)})`,
 );
@@ -87,12 +83,8 @@ const server = createServer(async (req, res) => {
   if (req.method === 'GET' && path === '/') {
     return serveFile(res, 'index.html', 'text/html; charset=utf-8');
   }
-  if (req.method === 'GET' && path === '/mcp-widget-telemetry.global.js') {
-    return serveFile(
-      res,
-      '../dist/mcp-widget-telemetry.global.js',
-      'text/javascript; charset=utf-8',
-    );
+  if (req.method === 'GET' && path === '/mcp-signal.global.js') {
+    return serveFile(res, '../dist/mcp-signal.global.js', 'text/javascript; charset=utf-8');
   }
   if (req.method === 'GET' && path === '/events') {
     return send(res, 200, JSON.stringify(store));
@@ -115,7 +107,7 @@ const server = createServer(async (req, res) => {
   }
 
   // BRIDGE transport: the demo's callTool POSTs the { events, sdk, sentAt } envelope here,
-  // simulating host -> your MCP server's app-only tool -> createTelemetryReceiver.
+  // simulating host -> your MCP server's app-only tool -> createSignalReceiver.
   if (req.method === 'POST' && path === `/tool/${tool.name}`) {
     const raw = await readBody(req);
     try {
@@ -131,7 +123,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\nmcp-widget-telemetry demo running at  http://localhost:${PORT}`);
+  console.log(`\nmcp-signal demo running at  http://localhost:${PORT}`);
   console.log(
     'Open it, click around, and watch events arrive below (and in your browser console).\n',
   );

@@ -1,7 +1,7 @@
 # Adapters reference
 
-An adapter is a destination for events. Configure one or more in `createTelemetry({ adapters: [...] })`
-(client) or `createTelemetryReceiver({ adapters: [...] })` (server). The destination adapters
+An adapter is a destination for events. Configure one or more in `createSignal({ adapters: [...] })`
+(client) or `createSignalReceiver({ adapters: [...] })` (server). The destination adapters
 (`console`, `webhook`, `posthog`) run in either place.
 
 ---
@@ -11,11 +11,11 @@ An adapter is a destination for events. Configure one or more in `createTelemetr
 Logs events to the console. Never makes a network request, so it always works — ideal for local dev
 and as a safe fallback.
 
-| Option   | Type               | Default             | Notes                                  |
-| -------- | ------------------ | ------------------- | -------------------------------------- |
-| `logger` | `Partial<Console>` | global `console`    | Custom sink.                           |
-| `pretty` | `boolean`          | `true`              | Use `console.group` + `console.table`. |
-| `label`  | `string`           | `"[mcp-telemetry]"` | Prefix.                                |
+| Option   | Type               | Default          | Notes                                  |
+| -------- | ------------------ | ---------------- | -------------------------------------- |
+| `logger` | `Partial<Console>` | global `console` | Custom sink.                           |
+| `pretty` | `boolean`          | `true`           | Use `console.group` + `console.table`. |
+| `label`  | `string`           | `"[mcp-signal]"` | Prefix.                                |
 
 ```js
 consoleAdapter({ label: '[my-widget]' });
@@ -35,7 +35,7 @@ POSTs event batches to any URL as `text/plain` (which keeps the request CORS-sim
 | `headers`     | `Record<string,string>`                               | —                        | ⚠️ Non-empty forces a CORS preflight (see below). |
 | `fetchImpl`   | `typeof fetch`                                        | global `fetch`           | For testing/SSR.                                  |
 
-The default body is `{ sdk, sentAt, batch: TelemetryEvent[] }`; your receiver does
+The default body is `{ sdk, sentAt, batch: SignalEvent[] }`; your receiver does
 `JSON.parse(rawTextBody)`. Each event includes a `messageId` you can dedupe on.
 
 **Headers caveat.** Any custom header (e.g. `Authorization`) makes the request non-simple → a CORS
@@ -75,18 +75,18 @@ real id (e.g. injected into the tool result and read from context), pass `distin
 The recommended transport. Hands each batch to an app-only MCP tool via the host bridge; your server
 forwards it. See [bridge.md](./bridge.md).
 
-| Option     | Type                      | Default              | Notes                                |
-| ---------- | ------------------------- | -------------------- | ------------------------------------ |
-| `toolName` | `string`                  | `'record_telemetry'` | Must match the server tool's `name`. |
-| `callTool` | `(name, args) => Promise` | auto-detected        | Override for certainty.              |
+| Option     | Type                      | Default           | Notes                                |
+| ---------- | ------------------------- | ----------------- | ------------------------------------ |
+| `toolName` | `string`                  | `'record_signal'` | Must match the server tool's `name`. |
+| `callTool` | `(name, args) => Promise` | auto-detected     | Override for certainty.              |
 
 `connectDomains` → `[]` (it doesn't touch the network directly).
 
 ---
 
-## `createTelemetryReceiver(config)` — server side
+## `createSignalReceiver(config)` — server side
 
-From `mcp-widget-telemetry/server`. Receives bridge payloads and fans them out to destination adapters.
+From `mcp-signal/server`. Receives bridge payloads and fans them out to destination adapters.
 
 | Option       | Type                       | Notes                                             |
 | ------------ | -------------------------- | ------------------------------------------------- |
@@ -98,14 +98,14 @@ Returns `{ ingest(payload), handleToolCall(args) }`. `handleToolCall` returns a 
 
 ---
 
-## `telemetryToolDefinition(options?)` — server side
+## `signalToolDefinition(options?)` — server side
 
 Returns a ready-made descriptor for the app-only tool. See [bridge.md](./bridge.md).
 
-| Option         | Type      | Default              | Notes                             |
-| -------------- | --------- | -------------------- | --------------------------------- |
-| `toolName`     | `string`  | `'record_telemetry'` |                                   |
-| `openaiCompat` | `boolean` | `true`               | Also emit legacy `openai/*` meta. |
+| Option         | Type      | Default           | Notes                             |
+| -------------- | --------- | ----------------- | --------------------------------- |
+| `toolName`     | `string`  | `'record_signal'` |                                   |
+| `openaiCompat` | `boolean` | `true`            | Also emit legacy `openai/*` meta. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Privacy & data
 
-`mcp-widget-telemetry` is neutral plumbing. It has **no telemetry of its own, no phone-home, and no
+`mcp-signal` is neutral plumbing. It has **no telemetry of its own, no phone-home, and no
 hidden collection.** It sends exactly what you configure, to the destination you configure, and
 nothing else. There is no "telemetry about the telemetry."
 
@@ -20,7 +20,7 @@ object, populated only where the value is reliably obtainable in the runtime:
 | `sdk`                            | this package's name + version                           | No                              |
 
 Auto-captured events carry only structural detail: interaction events record an element's
-`data-mcp-tel` value, tag, and id — **never element text or input values**. Error events include the
+`data-mcp-signal` value, tag, and id — **never element text or input values**. Error events include the
 message, source, line/column, and a truncated stack.
 
 ## What the SDK does **not** collect
@@ -42,7 +42,7 @@ need. Do not put personal data in event properties unless you intend to and are 
 - **Redact or drop per event** with `beforeSend`:
 
   ```js
-  createTelemetry({
+  createSignal({
     adapters,
     beforeSend: (event) => {
       if (event.properties.email) event.properties.email = '[redacted]';
@@ -56,14 +56,14 @@ need. Do not put personal data in event properties unless you intend to and are 
 
 - **Trim context** by redacting fields in `beforeSend`, e.g. `delete event.context.viewport`.
 
-- **Redact server-side too.** `createTelemetryReceiver({ beforeSend })` runs on your trusted server —
+- **Redact server-side too.** `createSignalReceiver({ beforeSend })` runs on your trusted server —
   a good place to scrub before anything reaches your analytics vendor.
 
 - **Turn it all off** with `enabled: false` — every method becomes a no-op and no listeners are
   attached. Useful behind your own consent gate:
 
   ```js
-  createTelemetry({ enabled: userConsented, adapters });
+  createSignal({ enabled: userConsented, adapters });
   ```
 
 ## Where the data lives

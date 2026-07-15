@@ -8,20 +8,14 @@ import { installInteractionCapture } from './interactions';
 import { installLifecycle } from './lifecycle';
 import { EventQueue } from './queue';
 import { withRetry } from './retry';
-import type {
-  Adapter,
-  TelemetryClient,
-  TelemetryConfig,
-  TelemetryContext,
-  TelemetryEvent,
-} from './types';
+import type { Adapter, SignalClient, SignalConfig, SignalContext, SignalEvent } from './types';
 
 /**
  * Create a telemetry client for a widget. Attaches lifecycle/error capture, batches
  * events, and forwards them to the configured adapters. Every method is safe to call
  * from plain JS and never throws into your widget.
  */
-export function createTelemetry(config: TelemetryConfig = {}): TelemetryClient {
+export function createSignal(config: SignalConfig = {}): SignalClient {
   const enabled = config.enabled ?? DEFAULTS.enabled;
   if (!enabled) return createNoopClient(config);
 
@@ -61,7 +55,7 @@ export function createTelemetry(config: TelemetryConfig = {}): TelemetryClient {
     }
   }
 
-  function makeEvent(event: string, properties?: Record<string, unknown>): TelemetryEvent {
+  function makeEvent(event: string, properties?: Record<string, unknown>): SignalEvent {
     return {
       event,
       properties: properties ?? {},
@@ -97,7 +91,7 @@ export function createTelemetry(config: TelemetryConfig = {}): TelemetryClient {
     }, 0);
   }
 
-  async function sendToAdapter(adapter: Adapter, batch: TelemetryEvent[]): Promise<void> {
+  async function sendToAdapter(adapter: Adapter, batch: SignalEvent[]): Promise<void> {
     await withRetry(async () => {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
       const timeoutId = controller
@@ -216,7 +210,7 @@ export function createTelemetry(config: TelemetryConfig = {}): TelemetryClient {
   };
 }
 
-function createNoopClient(config: TelemetryConfig): TelemetryClient {
+function createNoopClient(config: SignalConfig): SignalClient {
   const context = resolveContext(config);
   return {
     track() {},

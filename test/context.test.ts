@@ -45,7 +45,7 @@ describe('context', () => {
 
   it('always includes SDK identity and a timezone', () => {
     const ctx = resolveContext({});
-    expect(ctx.sdk.name).toBe('mcp-widget-telemetry');
+    expect(ctx.sdk.name).toBe('mcp-signal');
     expect(ctx.sdk.version).toBeTruthy();
     expect(typeof ctx.timeZone).toBe('string');
   });

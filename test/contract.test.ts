@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTelemetry } from '../src/client';
+import { createSignal } from '../src/client';
 import { fakeAdapter } from './helpers';
 import type { Adapter } from '../src/types';
 
@@ -19,7 +19,7 @@ describe('adapter contract', () => {
       },
     };
     const good = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [throwing, good] });
+    const t = createSignal({ ...base, adapters: [throwing, good] });
     t.track('a');
     await expect(t.flush()).resolves.toBeUndefined();
     expect(good.sent.map((e) => e.event)).toEqual(['a']);
@@ -31,7 +31,7 @@ describe('adapter contract', () => {
       send: () => Promise.reject(new Error('nope')),
     };
     const good = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [rejecting, good] });
+    const t = createSignal({ ...base, adapters: [rejecting, good] });
     t.track('a');
     await expect(t.flush()).resolves.toBeUndefined();
     expect(good.sent).toHaveLength(1);
@@ -39,7 +39,7 @@ describe('adapter contract', () => {
 
   it('passes the resolved context to adapter.init', () => {
     const adapter = fakeAdapter();
-    createTelemetry({ ...base, adapters: [adapter], widgetName: 'w' });
+    createSignal({ ...base, adapters: [adapter], widgetName: 'w' });
     expect(adapter.initContext?.widgetName).toBe('w');
     expect(adapter.initContext?.sessionId).toBeTruthy();
   });

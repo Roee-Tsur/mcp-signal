@@ -1,4 +1,4 @@
-import type { TelemetryEvent } from './types';
+import type { SignalEvent } from './types';
 
 /**
  * A bounded FIFO event buffer. `drain()` atomically takes everything, which makes every
@@ -6,7 +6,7 @@ import type { TelemetryEvent } from './types';
  * never send the same event twice.
  */
 export class EventQueue {
-  private items: TelemetryEvent[] = [];
+  private items: SignalEvent[] = [];
 
   constructor(
     private readonly maxSize: number,
@@ -17,7 +17,7 @@ export class EventQueue {
     return this.items.length;
   }
 
-  push(event: TelemetryEvent): void {
+  push(event: SignalEvent): void {
     this.items.push(event);
     if (this.items.length > this.maxSize) {
       const dropped = this.items.length - this.maxSize;
@@ -26,7 +26,7 @@ export class EventQueue {
     }
   }
 
-  drain(): TelemetryEvent[] {
+  drain(): SignalEvent[] {
     return this.items.splice(0, this.items.length);
   }
 }

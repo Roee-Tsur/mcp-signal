@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createTelemetry } from '../src/client';
+import { createSignal } from '../src/client';
 import { fakeAdapter } from './helpers';
 
 const base = { autoCaptureLifecycle: false, autoCaptureErrors: false, flushIntervalMs: 0 } as const;
@@ -8,10 +8,10 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('createTelemetry', () => {
+describe('createSignal', () => {
   it('queues events and flushes them to the adapter', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter] });
+    const t = createSignal({ ...base, adapters: [adapter] });
     t.track('a', { x: 1 });
     t.track('b');
     expect(t.queueLength).toBe(2);
@@ -23,7 +23,7 @@ describe('createTelemetry', () => {
 
   it('attaches context, timestamp, and a messageId to every event', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({
+    const t = createSignal({
       ...base,
       adapters: [adapter],
       widgetName: 'w',
@@ -35,7 +35,7 @@ describe('createTelemetry', () => {
     expect(evt.context.widgetName).toBe('w');
     expect(evt.context.widgetVersion).toBe('2');
     expect(evt.context.sessionId).toBeTruthy();
-    expect(evt.context.sdk.name).toBe('mcp-widget-telemetry');
+    expect(evt.context.sdk.name).toBe('mcp-signal');
     expect(typeof evt.timestamp).toBe('string');
     expect(typeof evt.messageId).toBe('string');
   });
@@ -43,7 +43,7 @@ describe('createTelemetry', () => {
   it('flushes automatically when the queue reaches batchSize', async () => {
     vi.useFakeTimers();
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter], batchSize: 3 });
+    const t = createSignal({ ...base, adapters: [adapter], batchSize: 3 });
     t.track('a');
     t.track('b');
     expect(adapter.sent).toHaveLength(0);
@@ -55,7 +55,7 @@ describe('createTelemetry', () => {
   it('flushes on the periodic interval', async () => {
     vi.useFakeTimers();
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter], flushIntervalMs: 1000 });
+    const t = createSignal({ ...base, adapters: [adapter], flushIntervalMs: 1000 });
     t.track('a');
     await vi.advanceTimersByTimeAsync(1000);
     expect(adapter.sent.map((e) => e.event)).toEqual(['a']);
@@ -65,7 +65,7 @@ describe('createTelemetry', () => {
   it('coalesces many tracks in one tick into a single flush', async () => {
     vi.useFakeTimers();
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter], batchSize: 2 });
+    const t = createSignal({ ...base, adapters: [adapter], batchSize: 2 });
     t.track('a');
     t.track('b');
     t.track('c');
@@ -77,7 +77,7 @@ describe('createTelemetry', () => {
 
   it('drops the oldest events past maxQueueSize', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter], maxQueueSize: 2, batchSize: 100 });
+    const t = createSignal({ ...base, adapters: [adapter], maxQueueSize: 2, batchSize: 100 });
     t.track('a', { i: 0 });
     t.track('b', { i: 1 });
     t.track('c', { i: 2 });
@@ -88,7 +88,7 @@ describe('createTelemetry', () => {
 
   it('is a hard no-op when disabled', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter], enabled: false });
+    const t = createSignal({ ...base, adapters: [adapter], enabled: false });
     expect(t.enabled).toBe(false);
     t.track('a');
     await t.flush();
@@ -98,7 +98,7 @@ describe('createTelemetry', () => {
 
   it('defaults to a console adapter when none are provided', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const t = createTelemetry({ ...base });
+    const t = createSignal({ ...base });
     expect(t.enabled).toBe(true);
     expect(() => t.track('a')).not.toThrow();
     logSpy.mockRestore();
@@ -106,7 +106,7 @@ describe('createTelemetry', () => {
 
   it('merges setContext into subsequent events', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter] });
+    const t = createSignal({ ...base, adapters: [adapter] });
     t.setContext({ plan: 'pro' });
     t.track('a');
     await t.flush();
@@ -115,7 +115,7 @@ describe('createTelemetry', () => {
 
   it('stops accepting events after shutdown', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter] });
+    const t = createSignal({ ...base, adapters: [adapter] });
     await t.shutdown();
     t.track('a');
     await t.flush();

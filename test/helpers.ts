@@ -1,12 +1,12 @@
 import { vi } from 'vitest';
-import type { Adapter, SendOptions, TelemetryContext, TelemetryEvent } from '../src/types';
+import type { Adapter, SendOptions, SignalContext, SignalEvent } from '../src/types';
 
 export interface FakeAdapter extends Adapter {
-  batches: TelemetryEvent[][];
-  beaconBatches: TelemetryEvent[][];
-  sent: TelemetryEvent[];
+  batches: SignalEvent[][];
+  beaconBatches: SignalEvent[][];
+  sent: SignalEvent[];
   calls: number;
-  initContext?: TelemetryContext;
+  initContext?: SignalContext;
 }
 
 /** An in-memory adapter that records what it receives. `failTimes` rejects the first N in-session sends. */
@@ -19,10 +19,10 @@ export function fakeAdapter(opts: { name?: string; failTimes?: number } = {}): F
     beaconBatches: [],
     sent: [],
     calls: 0,
-    init(context: TelemetryContext) {
+    init(context: SignalContext) {
       adapter.initContext = context;
     },
-    send(batch: TelemetryEvent[], options: SendOptions) {
+    send(batch: SignalEvent[], options: SendOptions) {
       adapter.calls += 1;
       if (options.beacon) {
         adapter.beaconBatches.push(batch);

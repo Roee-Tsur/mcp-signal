@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 describe('installErrorCapture', () => {
-  it('captures uncaught errors as mcp_widget_error', () => {
+  it('captures uncaught errors as mcp_signal_error', () => {
     const events: Array<{ event: string; props?: Record<string, unknown> }> = [];
     uninstall = installErrorCapture((event, props) => events.push({ event, props }));
 
@@ -17,7 +17,7 @@ describe('installErrorCapture', () => {
     );
 
     expect(events).toHaveLength(1);
-    expect(events[0].event).toBe('mcp_widget_error');
+    expect(events[0].event).toBe('mcp_signal_error');
     expect(events[0].props?.kind).toBe('error');
     expect(events[0].props?.message).toBe('boom');
     expect(events[0].props?.source).toBe('a.js');

@@ -1,5 +1,5 @@
 {
-  "name": "mcp-widget-telemetry",
+  "name": "mcp-signal",
   "version": "0.1.0",
   "description": "Tiny, zero-dependency, pluggable telemetry SDK for MCP widgets (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui). Capture lifecycle, custom, and error events and forward them to any analytics destination.",
   "keywords": [
@@ -29,19 +29,19 @@
   "author": "Roee Tsur <tsur.roee@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Roee-Tsur/mcp-widget-telemetry.git"
+    "url": "git+https://github.com/Roee-Tsur/mcp-signal.git"
   },
-  "homepage": "https://github.com/Roee-Tsur/mcp-widget-telemetry#readme",
+  "homepage": "https://github.com/Roee-Tsur/mcp-signal#readme",
   "bugs": {
-    "url": "https://github.com/Roee-Tsur/mcp-widget-telemetry/issues"
+    "url": "https://github.com/Roee-Tsur/mcp-signal/issues"
   },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "unpkg": "./dist/mcp-widget-telemetry.global.js",
-  "jsdelivr": "./dist/mcp-widget-telemetry.global.js",
+  "unpkg": "./dist/mcp-signal.global.js",
+  "jsdelivr": "./dist/mcp-signal.global.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

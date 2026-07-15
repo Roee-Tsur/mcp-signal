@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { createTelemetry } from '../src/client';
+import { createSignal } from '../src/client';
 import { installInteractionCapture } from '../src/interactions';
 import { fakeAdapter } from './helpers';
 
@@ -15,18 +15,18 @@ function click(el: Element) {
 }
 
 describe('installInteractionCapture', () => {
-  it('captures clicks on [data-mcp-tel] elements', () => {
+  it('captures clicks on [data-mcp-signal] elements', () => {
     const events: Array<{ event: string; props?: Record<string, unknown> }> = [];
     uninstall = installInteractionCapture((event, props) => events.push({ event, props }), {});
     const btn = document.createElement('button');
-    btn.setAttribute('data-mcp-tel', 'buy');
+    btn.setAttribute('data-mcp-signal', 'buy');
     btn.id = 'buy-btn';
     document.body.appendChild(btn);
 
     click(btn);
 
     expect(events).toHaveLength(1);
-    expect(events[0].event).toBe('mcp_widget_interaction');
+    expect(events[0].event).toBe('mcp_signal_interaction');
     expect(events[0].props).toEqual({ action: 'buy', tag: 'button', id: 'buy-btn' });
   });
 
@@ -34,7 +34,7 @@ describe('installInteractionCapture', () => {
     const events: Array<{ props?: Record<string, unknown> }> = [];
     uninstall = installInteractionCapture((_e, props) => events.push({ props }), {});
     const btn = document.createElement('button');
-    btn.setAttribute('data-mcp-tel', 'open');
+    btn.setAttribute('data-mcp-signal', 'open');
     const span = document.createElement('span');
     btn.appendChild(span);
     document.body.appendChild(btn);
@@ -66,17 +66,17 @@ describe('installInteractionCapture', () => {
 
   it('is off by default at the client level', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({
+    const t = createSignal({
       adapters: [adapter],
       autoCaptureLifecycle: false,
       autoCaptureErrors: false,
       flushIntervalMs: 0,
     });
     const btn = document.createElement('button');
-    btn.setAttribute('data-mcp-tel', 'buy');
+    btn.setAttribute('data-mcp-signal', 'buy');
     document.body.appendChild(btn);
     click(btn);
     await t.flush();
-    expect(adapter.sent.some((e) => e.event === 'mcp_widget_interaction')).toBe(false);
+    expect(adapter.sent.some((e) => e.event === 'mcp_signal_interaction')).toBe(false);
   });
 });

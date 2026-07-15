@@ -1,13 +1,13 @@
 import { BRIDGE_DEFAULT_TOOL } from './constants';
 
-export interface TelemetryToolDefinitionOptions {
-  /** Tool name. Must match the widget's `bridgeAdapter({ toolName })`. Default `"record_telemetry"`. */
+export interface SignalToolDefinitionOptions {
+  /** Tool name. Must match the widget's `bridgeAdapter({ toolName })`. Default `"record_signal"`. */
   toolName?: string;
   /** Also emit ChatGPT-legacy `openai/*` meta for older Apps SDK builds. Default true. */
   openaiCompat?: boolean;
 }
 
-export interface TelemetryToolDefinition {
+export interface SignalToolDefinition {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
@@ -24,7 +24,7 @@ export interface TelemetryToolDefinition {
  * it into your server's tool registration so you don't have to hand-write the metadata:
  *
  * ```ts
- * const tool = telemetryToolDefinition();
+ * const tool = signalToolDefinition();
  * server.registerTool(tool.name, tool, (args) => receiver.handleToolCall(args));
  * ```
  *
@@ -32,9 +32,9 @@ export interface TelemetryToolDefinition {
  * model's tool list — zero model context) and `readOnlyHint: true` (so hosts treat it as
  * harmless: silent on ChatGPT, first-use-then-remembered on Claude).
  */
-export function telemetryToolDefinition(
-  options: TelemetryToolDefinitionOptions = {},
-): TelemetryToolDefinition {
+export function signalToolDefinition(
+  options: SignalToolDefinitionOptions = {},
+): SignalToolDefinition {
   const name = options.toolName ?? BRIDGE_DEFAULT_TOOL;
   const openaiCompat = options.openaiCompat ?? true;
 
@@ -47,7 +47,7 @@ export function telemetryToolDefinition(
   return {
     name,
     description:
-      'Internal: receives batched widget telemetry from the mcp-widget-telemetry SDK. ' +
+      'Internal: receives batched widget telemetry from the mcp-signal SDK. ' +
       'App-only; not intended for model use.',
     inputSchema: {
       type: 'object',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTelemetry } from '../src/client';
+import { createSignal } from '../src/client';
 import { dispatchPageHide, fakeAdapter } from './helpers';
 
 const base = { autoCaptureLifecycle: false, autoCaptureErrors: false, flushIntervalMs: 0 } as const;
@@ -7,7 +7,7 @@ const base = { autoCaptureLifecycle: false, autoCaptureErrors: false, flushInter
 describe('beforeSend', () => {
   it('can mutate/redact an event', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({
+    const t = createSignal({
       ...base,
       adapters: [adapter],
       beforeSend: (e) => ({ ...e, properties: { ...e.properties, email: '[redacted]' } }),
@@ -19,7 +19,7 @@ describe('beforeSend', () => {
 
   it('drops an event when it returns null', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({
+    const t = createSignal({
       ...base,
       adapters: [adapter],
       beforeSend: (e) => (e.event === 'secret' ? null : e),
@@ -32,7 +32,7 @@ describe('beforeSend', () => {
 
   it('drops the event (fail-safe) when it throws', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({
+    const t = createSignal({
       ...base,
       adapters: [adapter],
       beforeSend: () => {
@@ -46,7 +46,7 @@ describe('beforeSend', () => {
 
   it('applies to teardown-flushed events too', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({
+    const t = createSignal({
       adapters: [adapter],
       autoCaptureErrors: false,
       flushIntervalMs: 0,
@@ -56,6 +56,6 @@ describe('beforeSend', () => {
     const beaconed = adapter.beaconBatches.flat();
     expect(beaconed.length).toBeGreaterThan(0);
     expect(beaconed.every((e) => e.properties.red === true)).toBe(true);
-    expect(beaconed.some((e) => e.event === 'mcp_widget_closed')).toBe(true);
+    expect(beaconed.some((e) => e.event === 'mcp_signal_closed')).toBe(true);
   });
 });

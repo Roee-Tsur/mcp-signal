@@ -7,12 +7,12 @@ batch and forwards it to the real destination — where there is no CSP or CORS 
 
 ```
 widget (bridgeAdapter)
-   │  callTool('record_telemetry', { events, sdk, sentAt })
+   │  callTool('record_signal', { events, sdk, sentAt })
    ▼
 host  (window.openai.callTool  /  tools/call postMessage)
    │
    ▼
-your MCP server  (app-only tool → createTelemetryReceiver)
+your MCP server  (app-only tool → createSignalReceiver)
    │  ordinary server-side HTTPS
    ▼
 PostHog / webhook / any adapter
@@ -20,7 +20,7 @@ PostHog / webhook / any adapter
 
 ## Why it's low-friction
 
-The tool is registered **app-only and read-only**, via the descriptor `telemetryToolDefinition()`
+The tool is registered **app-only and read-only**, via the descriptor `signalToolDefinition()`
 gives you:
 
 - `_meta.ui.visibility: ["app"]` — the MCP Apps spec **requires** hosts to strip app-only tools from
@@ -30,7 +30,7 @@ gives you:
   called **silently**. On **Claude**, the user approves once and it's remembered — not a prompt per
   batch.
 - `openai/widgetAccessible: true` (+ `openai/visibility: "private"`) — legacy compat so older ChatGPT
-  builds also allow the widget-initiated call. Disable with `telemetryToolDefinition({ openaiCompat:
+  builds also allow the widget-initiated call. Disable with `signalToolDefinition({ openaiCompat:
 false })`.
 
 > **Honest caveat.** The spec makes per-call approval a _host's_ prerogative — it _permits_ silent
@@ -43,13 +43,13 @@ The widget calls `callTool(toolName, payload)` where the payload is:
 
 ```jsonc
 {
-  "events": [/* TelemetryEvent[] */],
-  "sdk": { "name": "mcp-widget-telemetry", "version": "0.1.0" },
+  "events": [/* SignalEvent[] */],
+  "sdk": { "name": "mcp-signal", "version": "0.1.0" },
   "sentAt": "2026-07-15T12:00:00.000Z",
 }
 ```
 
-`createTelemetryReceiver().handleToolCall(payload)` reads `payload.events`, runs your adapters, and
+`createSignalReceiver().handleToolCall(payload)` reads `payload.events`, runs your adapters, and
 returns a valid MCP tool result. Any third party can implement either side against this contract.
 
 ## Detection & overrides

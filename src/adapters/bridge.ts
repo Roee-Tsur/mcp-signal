@@ -1,9 +1,9 @@
 import { BRIDGE_DEFAULT_TOOL, SDK_NAME, SDK_VERSION } from '../constants';
 import { detectBridge, type CallTool } from '../host-bridge';
-import type { Adapter, TelemetryEvent } from '../types';
+import type { Adapter, SignalEvent } from '../types';
 
 export interface BridgeAdapterConfig {
-  /** The app-only MCP tool to call. Default `"record_telemetry"`. */
+  /** The app-only MCP tool to call. Default `"record_signal"`. */
   toolName?: string;
   /**
    * How to invoke the tool. Defaults to auto-detection (`window.openai.callTool`, else a
@@ -18,8 +18,8 @@ export interface BridgeAdapterConfig {
  * The recommended transport. Instead of making a (CSP-blocked) network call, it hands
  * each batch to an app-only MCP tool on your own server via the host bridge; your server
  * then forwards to the real destination. This bypasses `connect-src` entirely and keeps
- * your analytics key server-side. Pair it with `createTelemetryReceiver` +
- * `telemetryToolDefinition` from `mcp-widget-telemetry/server`.
+ * your analytics key server-side. Pair it with `createSignalReceiver` +
+ * `signalToolDefinition` from `mcp-signal/server`.
  */
 export function bridgeAdapter(config: BridgeAdapterConfig = {}): Adapter {
   const toolName = config.toolName ?? BRIDGE_DEFAULT_TOOL;
@@ -38,7 +38,7 @@ export function bridgeAdapter(config: BridgeAdapterConfig = {}): Adapter {
   return {
     name: 'bridge',
     connectDomains: [],
-    send(events: TelemetryEvent[], { beacon }) {
+    send(events: SignalEvent[], { beacon }) {
       const call = getCallTool();
       if (!call) {
         if (beacon) return; // silent on teardown

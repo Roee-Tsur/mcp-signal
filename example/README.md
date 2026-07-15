@@ -1,4 +1,4 @@
-# mcp-widget-telemetry — runnable demo
+# mcp-signal — runnable demo
 
 A tiny, dependency-free demo that shows events flowing out of an instrumented "widget" through
 **both** transports the SDK ships with.
@@ -23,15 +23,15 @@ Click the buttons in the page. Each event is captured and sent through three ada
 - **`consoleAdapter`** — logged to your **browser console** (open dev tools).
 - **`webhookAdapter`** — the **direct** transport: POSTs straight to `/webhook`.
 - **`bridgeAdapter`** — the **bridge** transport: hands the batch to a `callTool` that forwards to
-  `/tool/record_telemetry`, which runs `createTelemetryReceiver` server-side — exactly what a real
+  `/tool/record_signal`, which runs `createSignalReceiver` server-side — exactly what a real
   MCP server's app-only tool handler does.
 
 The page polls the server and shows what each transport delivered, side by side. The **terminal**
 running the server also logs every event it receives (that's the console adapter running
 server-side, plus the demo's own logging).
 
-You'll also see events you never wrote code for: `mcp_widget_loaded` and `mcp_widget_visible` fire on
-load, and the "Throw an error" button produces an `mcp_widget_error`.
+You'll also see events you never wrote code for: `mcp_signal_loaded` and `mcp_signal_visible` fire on
+load, and the "Throw an error" button produces an `mcp_signal_error`.
 
 ## How the bridge is wired here
 

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { cspMeta, requiredConnectDomains } from '../src/csp';
-import { telemetryToolDefinition } from '../src/tool-def';
+import { signalToolDefinition } from '../src/tool-def';
 import { posthogAdapter } from '../src/adapters/posthog';
 import { webhookAdapter } from '../src/adapters/webhook';
 import { consoleAdapter } from '../src/adapters/console';
 import { bridgeAdapter } from '../src/adapters/bridge';
 
-describe('telemetryToolDefinition', () => {
+describe('signalToolDefinition', () => {
   it('produces an app-only, read-only tool descriptor', () => {
-    const tool = telemetryToolDefinition();
-    expect(tool.name).toBe('record_telemetry');
+    const tool = signalToolDefinition();
+    expect(tool.name).toBe('record_signal');
     expect((tool._meta.ui as { visibility: string[] }).visibility).toEqual(['app']);
     expect(tool.annotations.readOnlyHint).toBe(true);
     expect(tool.annotations.openWorldHint).toBe(false);
@@ -17,14 +17,14 @@ describe('telemetryToolDefinition', () => {
   });
 
   it('includes ChatGPT-legacy compat meta by default and can omit it', () => {
-    expect(telemetryToolDefinition()._meta['openai/widgetAccessible']).toBe(true);
+    expect(signalToolDefinition()._meta['openai/widgetAccessible']).toBe(true);
     expect(
-      telemetryToolDefinition({ openaiCompat: false })._meta['openai/widgetAccessible'],
+      signalToolDefinition({ openaiCompat: false })._meta['openai/widgetAccessible'],
     ).toBeUndefined();
   });
 
   it('accepts a custom tool name', () => {
-    expect(telemetryToolDefinition({ toolName: 'log_events' }).name).toBe('log_events');
+    expect(signalToolDefinition({ toolName: 'log_events' }).name).toBe('log_events');
   });
 });
 

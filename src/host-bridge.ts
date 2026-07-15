@@ -42,7 +42,7 @@ function postMessageCallTool(name: string, args: Record<string, unknown>): Promi
     const id = uuid();
     const timeout = setTimeout(() => {
       cleanup();
-      reject(new Error('mcp-widget-telemetry: bridge tools/call timed out'));
+      reject(new Error('mcp-signal: bridge tools/call timed out'));
     }, 10_000);
 
     function onMessage(event: MessageEvent) {

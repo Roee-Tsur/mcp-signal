@@ -1,7 +1,7 @@
 import { SDK_NAME, SDK_VERSION } from '../constants';
 import { nowIso } from '../ids';
 import { postSimple } from '../transport';
-import type { Adapter, TelemetryEvent } from '../types';
+import type { Adapter, SignalEvent } from '../types';
 
 export interface WebhookAdapterConfig {
   /** Destination URL. Receives a POST with a JSON body (sent as `text/plain`). */
@@ -9,7 +9,7 @@ export interface WebhookAdapterConfig {
   /** Body content type. Default `text/plain` (keeps the request CORS-simple). */
   contentType?: 'text/plain' | 'application/x-www-form-urlencoded';
   /** Shape the payload. Default `{ sdk, sentAt, batch }`. Result is JSON-stringified. */
-  transform?: (events: TelemetryEvent[]) => unknown;
+  transform?: (events: SignalEvent[]) => unknown;
   /**
    * Custom headers. WARNING: any header beyond the CORS-safelisted set forces the
    * request into `cors` mode + a preflight, which is fragile inside sandboxed widgets
@@ -42,7 +42,7 @@ export function webhookAdapter(config: WebhookAdapterConfig): Adapter {
   return {
     name: 'webhook',
     connectDomains: origin ? [origin] : [],
-    send(events: TelemetryEvent[], { beacon, signal }) {
+    send(events: SignalEvent[], { beacon, signal }) {
       const payload = config.transform
         ? config.transform(events)
         : { sdk: { name: SDK_NAME, version: SDK_VERSION }, sentAt: nowIso(), batch: events };

@@ -20,7 +20,7 @@ npm run format      # prettier
   fine.
 - **Browser-safe core.** Everything reachable from `src/index.ts` must guard `window`/`document`/
   `navigator` access so it's safe to import anywhere. Server-only code lives behind
-  `src/server.ts` (the `mcp-widget-telemetry/server` export) and must never touch `window`.
+  `src/server.ts` (the `mcp-signal/server` export) and must never touch `window`.
 - **Tests for behavior changes.** Add or update tests under `test/`. Keep coverage healthy.
 - **Format & typecheck** before opening a PR (`npm run format && npm run typecheck && npm test`).
 

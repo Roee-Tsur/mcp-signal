@@ -11,21 +11,21 @@ steps. All three transports can be mixed — a client can send to several adapte
 **Bundled (most common).** If your widget is built with a bundler:
 
 ```js
-import { createTelemetry, bridgeAdapter } from 'mcp-widget-telemetry';
+import { createSignal, bridgeAdapter } from 'mcp-signal';
 ```
 
 **Raw HTML / `srcdoc` widget (no bundler).** Inline the standalone build so you don't depend on a CDN
 (which would require a `script-src`/`resourceDomains` CSP entry). Copy
-`node_modules/mcp-widget-telemetry/dist/mcp-widget-telemetry.global.js` into your HTML inside a
+`node_modules/mcp-signal/dist/mcp-signal.global.js` into your HTML inside a
 `<script>` tag, then use the global:
 
 ```html
 <script>
-  /* …contents of mcp-widget-telemetry.global.js… */
+  /* …contents of mcp-signal.global.js… */
 </script>
 <script>
-  const { createTelemetry, bridgeAdapter } = window.McpTelemetry;
-  const telemetry = createTelemetry({ adapters: [bridgeAdapter()] });
+  const { createSignal, bridgeAdapter } = window.McpSignal;
+  const signal = createSignal({ adapters: [bridgeAdapter()] });
 </script>
 ```
 
@@ -39,12 +39,12 @@ stays server-side.
 ### 1. Widget
 
 ```js
-import { createTelemetry, bridgeAdapter } from 'mcp-widget-telemetry';
+import { createSignal, bridgeAdapter } from 'mcp-signal';
 
-export const telemetry = createTelemetry({
+export const signal = createSignal({
   widgetName: 'weather',
   widgetVersion: '1.0.0',
-  adapters: [bridgeAdapter({ toolName: 'record_telemetry' })],
+  adapters: [bridgeAdapter({ toolName: 'record_signal' })],
 });
 ```
 
@@ -55,9 +55,9 @@ call method for certainty: `bridgeAdapter({ callTool: (name, args) => app.callSe
 ### 2. Server — build a receiver
 
 ```js
-import { createTelemetryReceiver, posthogAdapter } from 'mcp-widget-telemetry/server';
+import { createSignalReceiver, posthogAdapter } from 'mcp-signal/server';
 
-const receiver = createTelemetryReceiver({
+const receiver = createSignalReceiver({
   adapters: [posthogAdapter({ apiKey: process.env.POSTHOG_KEY, host: 'eu' })],
   // Optional: enrich or scrub on the trusted side.
   // beforeSend: (e) => ({ ...e, properties: { ...e.properties, user_id: currentUserId } }),
@@ -69,9 +69,9 @@ const receiver = createTelemetryReceiver({
 The descriptor is generated for you. Register it however your server registers tools:
 
 ```js
-import { telemetryToolDefinition } from 'mcp-widget-telemetry/server';
+import { signalToolDefinition } from 'mcp-signal/server';
 
-const tool = telemetryToolDefinition();
+const tool = signalToolDefinition();
 // tool = { name, description, inputSchema, annotations: { readOnlyHint: true, … },
 //          _meta: { ui: { visibility: ['app'] }, 'openai/widgetAccessible': true } }
 ```
@@ -99,7 +99,7 @@ if (request.params.name === tool.name) {
 }
 ```
 
-Make sure the widget's `toolName` matches the tool's `name` (default `record_telemetry`). That's it —
+Make sure the widget's `toolName` matches the tool's `name` (default `record_signal`). That's it —
 no CSP changes.
 
 ---
@@ -112,9 +112,9 @@ your public key ships in the widget.
 ### 1. Widget
 
 ```js
-import { createTelemetry, posthogAdapter, webhookAdapter } from 'mcp-widget-telemetry';
+import { createSignal, posthogAdapter, webhookAdapter } from 'mcp-signal';
 
-export const telemetry = createTelemetry({
+export const signal = createSignal({
   adapters: [
     posthogAdapter({ apiKey: 'phc_public_key', host: 'eu' }),
     // or webhookAdapter({ url: 'https://ingest.example.com/mcp' }),
@@ -128,7 +128,7 @@ Direct calls are blocked unless the destination origin is in your widget resourc
 fragment and spread it into your `ui://` resource `_meta`:
 
 ```js
-import { cspMeta } from 'mcp-widget-telemetry';
+import { cspMeta } from 'mcp-signal';
 
 const resourceMeta = {
   ...cspMeta([posthogAdapter({ apiKey: 'phc_public_key', host: 'eu' })]),
@@ -139,7 +139,7 @@ const resourceMeta = {
 ChatGPT reads a legacy key — mirror it if you target older builds:
 
 ```js
-import { requiredConnectDomains } from 'mcp-widget-telemetry';
+import { requiredConnectDomains } from 'mcp-signal';
 const domains = requiredConnectDomains([/* adapters */]);
 const meta = {
   ...cspMeta(/* adapters */),
@@ -155,7 +155,7 @@ add.
 ## Transport C — console (local dev)
 
 ```js
-createTelemetry({ adapters: [consoleAdapter()] });
+createSignal({ adapters: [consoleAdapter()] });
 ```
 
 Always works, never networks. Great as a fallback destination alongside the others.

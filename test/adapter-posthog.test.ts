@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { posthogAdapter } from '../src/adapters/posthog';
 import { mockFetch } from './helpers';
-import type { TelemetryEvent } from '../src/types';
+import type { SignalEvent } from '../src/types';
 
-function event(name: string, props: Record<string, unknown> = {}): TelemetryEvent {
+function event(name: string, props: Record<string, unknown> = {}): SignalEvent {
   return {
     event: name,
     properties: props,
@@ -15,7 +15,7 @@ function event(name: string, props: Record<string, unknown> = {}): TelemetryEven
       widgetName: 'weather',
       widgetVersion: '1.2.0',
       theme: 'dark',
-      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+      sdk: { name: 'mcp-signal', version: '0' },
     },
   };
 }
@@ -41,7 +41,7 @@ describe('posthogAdapter', () => {
     expect(e.timestamp).toBe('2026-07-15T00:00:00.000Z');
     expect(e.properties.distinct_id).toBe('sess-1'); // defaults to sessionId
     expect(e.properties.$session_id).toBe('sess-1');
-    expect(e.properties.$lib).toBe('mcp-widget-telemetry');
+    expect(e.properties.$lib).toBe('mcp-signal');
     expect(e.properties.widget_name).toBe('weather');
     expect(e.properties.day).toBe('tue'); // event property preserved
   });

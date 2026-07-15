@@ -7,7 +7,7 @@ function truncate(stack?: string): string | undefined {
 }
 
 /**
- * Capture uncaught errors and unhandled promise rejections as `mcp_widget_error`
+ * Capture uncaught errors and unhandled promise rejections as `mcp_signal_error`
  * events. Filters out resource-load errors (missing images/scripts), truncates stacks,
  * and guards against re-entrancy so a fault in the handler cannot loop. Never calls
  * `preventDefault`, so the host still sees the error. Returns an uninstall function.

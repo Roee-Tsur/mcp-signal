@@ -3,7 +3,7 @@
  * is missing or throws, which the jsdom happy path doesn't reproduce on its own.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createTelemetry } from '../src/client';
+import { createSignal } from '../src/client';
 import { uuid } from '../src/ids';
 import { postSimple } from '../src/transport';
 import { detectBridge } from '../src/host-bridge';
@@ -17,11 +17,11 @@ import { webhookAdapter } from '../src/adapters/webhook';
 import { posthogAdapter } from '../src/adapters/posthog';
 import { bridgeAdapter } from '../src/adapters/bridge';
 import { defineVisibility, fakeAdapter, mockFetch, setOpenAi, setVisibility } from './helpers';
-import type { TelemetryEvent } from '../src/types';
+import type { SignalEvent } from '../src/types';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-function sampleEvent(): TelemetryEvent {
+function sampleEvent(): SignalEvent {
   return {
     event: 'e',
     properties: {},
@@ -30,7 +30,7 @@ function sampleEvent(): TelemetryEvent {
     context: {
       sessionId: 's',
       host: 'browser',
-      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+      sdk: { name: 'mcp-signal', version: '0' },
     },
   };
 }
@@ -180,7 +180,7 @@ describe('lifecycle re-show', () => {
     setVisibility('hidden');
     setVisibility('visible');
     uninstall();
-    expect(emitted.filter((e) => e === 'mcp_widget_visible').length).toBeGreaterThanOrEqual(2);
+    expect(emitted.filter((e) => e === 'mcp_signal_visible').length).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -226,12 +226,12 @@ describe('client edge cases', () => {
   } as const;
 
   it('exposes context via getContext (enabled and disabled)', () => {
-    const enabled = createTelemetry({ ...base, adapters: [fakeAdapter()] });
+    const enabled = createSignal({ ...base, adapters: [fakeAdapter()] });
     enabled.setContext({ plan: 'pro' });
     expect(enabled.getContext().plan).toBe('pro');
 
-    const disabled = createTelemetry({ ...base, enabled: false });
-    expect(disabled.getContext().sdk.name).toBe('mcp-widget-telemetry');
+    const disabled = createSignal({ ...base, enabled: false });
+    expect(disabled.getContext().sdk.name).toBe('mcp-signal');
     expect(disabled.queueLength).toBe(0);
   });
 
@@ -241,12 +241,12 @@ describe('client edge cases', () => {
       init: () => Promise.reject(new Error('init boom')),
       send: () => {},
     };
-    expect(() => createTelemetry({ ...base, adapters: [adapter] })).not.toThrow();
+    expect(() => createSignal({ ...base, adapters: [adapter] })).not.toThrow();
     await new Promise((r) => setTimeout(r, 0)); // let the isolated rejection settle
   });
 
   it('shutdown is idempotent', async () => {
-    const t = createTelemetry({ ...base, adapters: [fakeAdapter()] });
+    const t = createSignal({ ...base, adapters: [fakeAdapter()] });
     await t.shutdown();
     await expect(t.shutdown()).resolves.toBeUndefined();
   });

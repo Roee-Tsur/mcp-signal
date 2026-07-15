@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { webhookAdapter } from '../src/adapters/webhook';
 import { installSendBeaconMock, mockFetch } from './helpers';
-import type { TelemetryEvent } from '../src/types';
+import type { SignalEvent } from '../src/types';
 
-function event(name: string): TelemetryEvent {
+function event(name: string): SignalEvent {
   return {
     event: name,
     properties: {},
@@ -12,7 +12,7 @@ function event(name: string): TelemetryEvent {
     context: {
       sessionId: 's',
       host: 'browser',
-      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+      sdk: { name: 'mcp-signal', version: '0' },
     },
   };
 }
@@ -27,7 +27,7 @@ describe('webhookAdapter', () => {
     expect(init.mode).toBe('no-cors');
     expect((init.headers as Record<string, string>)['Content-Type']).toMatch(/text\/plain/);
     const body = JSON.parse(init.body as string);
-    expect(body.sdk.name).toBe('mcp-widget-telemetry');
+    expect(body.sdk.name).toBe('mcp-signal');
     expect(body.batch).toHaveLength(1);
     expect(body.batch[0].event).toBe('a');
   });

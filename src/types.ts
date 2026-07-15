@@ -1,5 +1,5 @@
 /**
- * Public type surface for mcp-widget-telemetry.
+ * Public type surface for mcp-signal.
  *
  * The one interface that matters most is {@link Adapter}: implement it and you can
  * send events anywhere. Everything else configures the core pipeline.
@@ -10,7 +10,7 @@ export type HostEnv = 'chatgpt' | 'mcp-apps' | 'mcp-ui' | 'browser' | 'unknown';
 
 /** SDK self-identification attached to every event's context. */
 export interface SdkInfo {
-  name: 'mcp-widget-telemetry';
+  name: 'mcp-signal';
   version: string;
 }
 
@@ -19,7 +19,7 @@ export interface SdkInfo {
  * present only when reliably obtainable in the current runtime. No user identity is
  * ever collected — `sessionId` is anonymous and scoped to a single widget load.
  */
-export interface TelemetryContext {
+export interface SignalContext {
   widgetName?: string;
   widgetVersion?: string;
   /** Stable for one widget load. `openai/widgetSessionId` when available, else a minted UUID. */
@@ -36,16 +36,16 @@ export interface TelemetryContext {
 }
 
 /** A single captured event. */
-export interface TelemetryEvent {
-  /** Event name, e.g. `"mcp_widget_loaded"` or a custom name passed to `track()`. */
+export interface SignalEvent {
+  /** Event name, e.g. `"mcp_signal_loaded"` or a custom name passed to `track()`. */
   event: string;
   properties: Record<string, unknown>;
   /** ISO-8601 emit time. */
   timestamp: string;
   /** Idempotency key. Deduplicates retried/beacon double-sends downstream. */
   messageId: string;
-  /** Snapshot of {@link TelemetryContext} at emit time. */
-  context: TelemetryContext;
+  /** Snapshot of {@link SignalContext} at emit time. */
+  context: SignalContext;
 }
 
 /** Options passed to {@link Adapter.send}. */
@@ -78,9 +78,9 @@ export interface Adapter {
    */
   readonly connectDomains?: string[];
   /** Optional one-time setup. Receives resolved context. Errors are isolated. */
-  init?(context: TelemetryContext): void | Promise<void>;
+  init?(context: SignalContext): void | Promise<void>;
   /** Transmit a batch. See {@link SendOptions} for the beacon contract. */
-  send(events: TelemetryEvent[], options: SendOptions): void | Promise<void>;
+  send(events: SignalEvent[], options: SendOptions): void | Promise<void>;
 }
 
 /** Retry/backoff policy for in-session sends. */
@@ -99,16 +99,16 @@ export interface RetryConfig {
 
 /** Opt-in automatic capture of basic click interactions. */
 export interface InteractionCaptureConfig {
-  /** Capture clicks on elements carrying this attribute. Default `"data-mcp-tel"`. */
+  /** Capture clicks on elements carrying this attribute. Default `"data-mcp-signal"`. */
   attribute?: string;
   /** Also capture every other click (tag + id only, no text). Noisy. Default false. */
   captureAllClicks?: boolean;
-  /** Event name emitted. Default `"mcp_widget_interaction"`. */
+  /** Event name emitted. Default `"mcp_signal_interaction"`. */
   eventName?: string;
 }
 
-/** Configuration for {@link createTelemetry}. */
-export interface TelemetryConfig {
+/** Configuration for {@link createSignal}. */
+export interface SignalConfig {
   /** Destinations. If empty/omitted, defaults to `[consoleAdapter()]`. */
   adapters?: Adapter[];
   widgetName?: string;
@@ -131,7 +131,7 @@ export interface TelemetryConfig {
   requestTimeoutMs?: number;
   retry?: RetryConfig;
   /** Redact or drop each event before it is queued. Return `null` to drop. */
-  beforeSend?: (event: TelemetryEvent) => TelemetryEvent | null;
+  beforeSend?: (event: SignalEvent) => SignalEvent | null;
   /** Static context merged into every event. */
   context?: Record<string, unknown>;
   /** Force the session id (else `openai/widgetSessionId`, else a minted UUID). */
@@ -142,18 +142,18 @@ export interface TelemetryConfig {
   debug?: boolean;
 }
 
-/** The object returned by {@link createTelemetry}. */
-export interface TelemetryClient {
+/** The object returned by {@link createSignal}. */
+export interface SignalClient {
   /** Queue a custom event. No-op when disabled. Never throws. */
   track(event: string, properties?: Record<string, unknown>): void;
   /** Send everything queued now (in-session, awaitable, retried). */
   flush(): Promise<void>;
-  /** Emit `mcp_widget_closed` once, flush, detach listeners, stop the timer. Idempotent. */
+  /** Emit `mcp_signal_closed` once, flush, detach listeners, stop the timer. Idempotent. */
   shutdown(): Promise<void>;
   /** Merge additional static context applied to subsequent events. */
   setContext(patch: Record<string, unknown>): void;
   /** Read the resolved context (debugging). */
-  getContext(): Readonly<TelemetryContext>;
+  getContext(): Readonly<SignalContext>;
   /** Current queue depth. */
   readonly queueLength: number;
   /** Resolved enabled flag. */

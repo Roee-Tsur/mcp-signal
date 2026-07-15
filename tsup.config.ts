@@ -22,9 +22,9 @@ export default defineConfig([
   // Standalone minified IIFE for a single <script> include inside a widget.
   // Built from the browser entry only, so server/tool code never ships to the widget.
   {
-    entry: { 'mcp-widget-telemetry': 'src/index.ts' },
+    entry: { 'mcp-signal': 'src/index.ts' },
     format: ['iife'],
-    globalName: 'McpTelemetry',
+    globalName: 'McpSignal',
     minify: true,
     sourcemap: true,
     target: 'es2020',

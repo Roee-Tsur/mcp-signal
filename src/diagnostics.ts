@@ -13,7 +13,7 @@ export interface Diagnostics {
   installCspWatch(domains: string[]): () => void;
 }
 
-const PREFIX = '[mcp-widget-telemetry]';
+const PREFIX = '[mcp-signal]';
 
 export function createDiagnostics(debug: boolean): Diagnostics {
   const c = typeof console !== 'undefined' ? console : undefined;

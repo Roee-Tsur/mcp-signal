@@ -1,5 +1,5 @@
 /** Package name, used for the `sdk.name` field (typed as a literal). */
-export const SDK_NAME = 'mcp-widget-telemetry';
+export const SDK_NAME = 'mcp-signal';
 
 /** Resolved SDK version. Replaced at build/test time; falls back safely otherwise. */
 export const SDK_VERSION: string =
@@ -7,12 +7,12 @@ export const SDK_VERSION: string =
 
 /** Canonical event names emitted by the auto-capture modules. */
 export const EVENTS = {
-  LOADED: 'mcp_widget_loaded',
-  VISIBLE: 'mcp_widget_visible',
-  HIDDEN: 'mcp_widget_hidden',
-  CLOSED: 'mcp_widget_closed',
-  ERROR: 'mcp_widget_error',
-  INTERACTION: 'mcp_widget_interaction',
+  LOADED: 'mcp_signal_loaded',
+  VISIBLE: 'mcp_signal_visible',
+  HIDDEN: 'mcp_signal_hidden',
+  CLOSED: 'mcp_signal_closed',
+  ERROR: 'mcp_signal_error',
+  INTERACTION: 'mcp_signal_interaction',
 } as const;
 
 /** Config defaults. */
@@ -52,7 +52,7 @@ export const LIMITS = {
 } as const;
 
 /** Default tool name the bridge transport calls. */
-export const BRIDGE_DEFAULT_TOOL = 'record_telemetry';
+export const BRIDGE_DEFAULT_TOOL = 'record_signal';
 
 /** Default attribute the interaction capture looks for. */
-export const DEFAULT_INTERACTION_ATTR = 'data-mcp-tel';
+export const DEFAULT_INTERACTION_ATTR = 'data-mcp-signal';

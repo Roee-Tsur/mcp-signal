@@ -10,9 +10,9 @@ transmit.
 interface Adapter {
   readonly name: string;
   readonly connectDomains?: string[]; // origins you POST to directly (for the CSP helper)
-  init?(context: TelemetryContext): void | Promise<void>;
+  init?(context: SignalContext): void | Promise<void>;
   send(
-    events: TelemetryEvent[],
+    events: SignalEvent[],
     options: { beacon: boolean; signal?: AbortSignal },
   ): void | Promise<void>;
 }
@@ -42,14 +42,14 @@ help users allowlist you. Return `[]` (or omit) if you don't touch the network d
 ## A minimal example
 
 ```ts
-import type { Adapter, TelemetryEvent } from 'mcp-widget-telemetry';
+import type { Adapter, SignalEvent } from 'mcp-signal';
 
 export function myAdapter(config: { url: string }): Adapter {
   const origin = new URL(config.url).origin;
   return {
     name: 'my-destination',
     connectDomains: [origin],
-    send(events: TelemetryEvent[], { beacon }) {
+    send(events: SignalEvent[], { beacon }) {
       const body = JSON.stringify({ batch: events });
       // Keep it CORS-simple: text/plain, no custom headers.
       if (beacon) {
@@ -73,7 +73,7 @@ helper; the pattern above mirrors it. Copy it and swap the payload shaping.
 ## Running server-side
 
 If your adapter only uses `fetch` and guards `navigator`/`window` behind the `beacon` branch, it works
-**unchanged** inside `createTelemetryReceiver` on the server. That's how `posthogAdapter` and
+**unchanged** inside `createSignalReceiver` on the server. That's how `posthogAdapter` and
 `webhookAdapter` run in both places.
 
 ## Testing your adapter

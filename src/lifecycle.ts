@@ -5,7 +5,7 @@ export interface LifecycleHooks {
   emit(event: string): void;
   /** Best-effort teardown flush (beacon). */
   flushBeacon(reason: string): void;
-  /** Emit `mcp_widget_closed` at most once. */
+  /** Emit `mcp_signal_closed` at most once. */
   emitClosedOnce(): void;
   /** Called on bfcache restore so a later real close still counts. */
   onRestore(): void;

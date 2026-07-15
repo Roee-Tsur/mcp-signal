@@ -6,7 +6,7 @@ type Emit = (event: string, properties?: Record<string, unknown>) => void;
 /**
  * Opt-in click capture. A single delegated listener (capture + passive, so it never
  * interferes with the app's own handlers) emits an interaction event for clicks on
- * elements carrying the marker attribute (default `data-mcp-tel`). It records the
+ * elements carrying the marker attribute (default `data-mcp-signal`). It records the
  * attribute value, tag, and id only — never element text or input values — to stay
  * PII-safe by default. Returns an uninstall function.
  */

@@ -33,10 +33,10 @@ describe('detectBridge (postMessage transport)', () => {
     const call = detectBridge();
     expect(call).toBeTypeOf('function');
 
-    const promise = call!('record_telemetry', { events: [] });
+    const promise = call!('record_signal', { events: [] });
     expect(posted).toHaveLength(1);
     expect(posted[0].method).toBe('tools/call');
-    expect(posted[0].params).toEqual({ name: 'record_telemetry', arguments: { events: [] } });
+    expect(posted[0].params).toEqual({ name: 'record_signal', arguments: { events: [] } });
 
     window.dispatchEvent(new MessageEvent('message', { data: { id: posted[0].id, result: 'ok' } }));
     await expect(promise).resolves.toBe('ok');
@@ -46,7 +46,7 @@ describe('detectBridge (postMessage transport)', () => {
     cleanupOpenAi = setOpenAi(undefined);
     const posted = useFakeParent();
     const call = detectBridge();
-    const promise = call!('record_telemetry', {});
+    const promise = call!('record_signal', {});
     window.dispatchEvent(
       new MessageEvent('message', { data: { id: posted[0].id, error: { message: 'denied' } } }),
     );

@@ -1,6 +1,6 @@
 import { POSTHOG_HOSTS, SDK_NAME, SDK_VERSION } from '../constants';
 import { postSimple } from '../transport';
-import type { Adapter, TelemetryContext, TelemetryEvent } from '../types';
+import type { Adapter, SignalContext, SignalEvent } from '../types';
 
 export interface PostHogAdapterConfig {
   /** Public project API key (`phc_...`). Safe in the browser; sent in the body. */
@@ -12,7 +12,7 @@ export interface PostHogAdapterConfig {
    * stable user identity is available inside a widget. Pass a value or a function to use
    * your own (e.g. an id you injected into the tool result).
    */
-  distinctId?: string | ((context: TelemetryContext) => string);
+  distinctId?: string | ((context: SignalContext) => string);
   /** Extra properties merged into every event (below the event's own properties). */
   defaultProperties?: Record<string, unknown>;
   /** Override `fetch` (testing/SSR). */
@@ -33,7 +33,7 @@ function originOf(url: string): string {
   }
 }
 
-function toPosthogEvent(event: TelemetryEvent, config: PostHogAdapterConfig) {
+function toPosthogEvent(event: SignalEvent, config: PostHogAdapterConfig) {
   const ctx = event.context;
   const distinctId =
     typeof config.distinctId === 'function'
@@ -78,7 +78,7 @@ export function posthogAdapter(config: PostHogAdapterConfig): Adapter {
   return {
     name: 'posthog',
     connectDomains: [originOf(base)],
-    send(events: TelemetryEvent[], { beacon, signal }) {
+    send(events: SignalEvent[], { beacon, signal }) {
       const body = JSON.stringify({
         api_key: config.apiKey,
         historical_migration: false,

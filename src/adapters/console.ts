@@ -1,11 +1,11 @@
-import type { Adapter, TelemetryEvent } from '../types';
+import type { Adapter, SignalEvent } from '../types';
 
 export interface ConsoleAdapterConfig {
   /** Console-like sink. Defaults to the global `console`. */
   logger?: Partial<Console>;
   /** Use `console.group` + `console.table` formatting. Default true. */
   pretty?: boolean;
-  /** Prefix label. Default `"[mcp-telemetry]"`. */
+  /** Prefix label. Default `"[mcp-signal]"`. */
   label?: string;
 }
 
@@ -18,7 +18,7 @@ export function consoleAdapter(config: ConsoleAdapterConfig = {}): Adapter {
   const logger = (config.logger ?? (typeof console !== 'undefined' ? console : undefined)) as
     Console | undefined;
   const pretty = config.pretty ?? true;
-  const label = config.label ?? '[mcp-telemetry]';
+  const label = config.label ?? '[mcp-signal]';
 
   return {
     name: 'console',
@@ -26,7 +26,7 @@ export function consoleAdapter(config: ConsoleAdapterConfig = {}): Adapter {
     init(context) {
       logger?.log?.(label, 'ready', { host: context.host, session: context.sessionId });
     },
-    send(events: TelemetryEvent[], { beacon }) {
+    send(events: SignalEvent[], { beacon }) {
       if (!logger) return;
       const tag = beacon ? `${label} (beacon)` : label;
       if (pretty && typeof logger.group === 'function' && typeof logger.table === 'function') {

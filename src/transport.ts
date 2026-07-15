@@ -81,7 +81,7 @@ export async function postSimple(
 
   // ---- In-session path: awaitable, rejection => the core retries ----
   const f = resolveFetch(opts);
-  if (!f) throw new Error('mcp-widget-telemetry: fetch is not available in this environment');
+  if (!f) throw new Error('mcp-signal: fetch is not available in this environment');
 
   const hasCustomHeaders = !!opts.headers && Object.keys(opts.headers).length > 0;
   const mode = opts.mode ?? (hasCustomHeaders ? 'cors' : 'no-cors');
@@ -96,6 +96,6 @@ export async function postSimple(
   // In no-cors mode the response is opaque (status 0) — resolution == success.
   // In cors mode we can inspect status; treat 5xx as retryable.
   if (mode !== 'no-cors' && res && typeof res.status === 'number' && res.status >= 500) {
-    throw new Error(`mcp-widget-telemetry: destination returned HTTP ${res.status}`);
+    throw new Error(`mcp-signal: destination returned HTTP ${res.status}`);
   }
 }
