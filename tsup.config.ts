@@ -1,9 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'tsup';
 
-const version = JSON.parse(
-  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
-).version as string;
+const version = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
+  .version as string;
 
 const define = { __SDK_VERSION__: JSON.stringify(version) };
 

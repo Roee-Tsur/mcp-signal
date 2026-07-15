@@ -30,7 +30,9 @@ describe('withRetry', () => {
   });
 
   it('does not retry an error marked retryable: false', async () => {
-    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('permanent'), { retryable: false }));
+    const fn = vi
+      .fn()
+      .mockRejectedValue(Object.assign(new Error('permanent'), { retryable: false }));
     await expect(withRetry(fn, { baseDelayMs: 1 })).rejects.toThrow('permanent');
     expect(fn).toHaveBeenCalledTimes(1);
   });

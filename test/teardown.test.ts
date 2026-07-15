@@ -9,7 +9,11 @@ import {
 } from './helpers';
 import type { TelemetryClient } from '../src/types';
 
-const base = { autoCaptureErrors: false, autoCaptureInteractions: false, flushIntervalMs: 0 } as const;
+const base = {
+  autoCaptureErrors: false,
+  autoCaptureInteractions: false,
+  flushIntervalMs: 0,
+} as const;
 let client: TelemetryClient | undefined;
 
 beforeEach(() => defineVisibility('visible'));
@@ -18,7 +22,8 @@ afterEach(async () => {
   client = undefined;
 });
 
-const beaconedNames = (a: ReturnType<typeof fakeAdapter>) => a.beaconBatches.flat().map((e) => e.event);
+const beaconedNames = (a: ReturnType<typeof fakeAdapter>) =>
+  a.beaconBatches.flat().map((e) => e.event);
 
 describe('lifecycle + teardown', () => {
   it('emits loaded (and visible) on start', async () => {

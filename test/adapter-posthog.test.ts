@@ -48,9 +48,9 @@ describe('posthogAdapter', () => {
 
   it('targets US by default and self-hosted when given a URL', () => {
     expect(posthogAdapter({ apiKey: 'phc' }).connectDomains).toEqual(['https://us.i.posthog.com']);
-    expect(posthogAdapter({ apiKey: 'phc', host: 'https://ph.example.com/' }).connectDomains).toEqual([
-      'https://ph.example.com',
-    ]);
+    expect(
+      posthogAdapter({ apiKey: 'phc', host: 'https://ph.example.com/' }).connectDomains,
+    ).toEqual(['https://ph.example.com']);
   });
 
   it('lets developer event properties override context-derived ones', async () => {
@@ -67,7 +67,11 @@ describe('posthogAdapter', () => {
 
   it('supports a custom distinctId resolver', async () => {
     const fetchImpl = mockFetch();
-    const adapter = posthogAdapter({ apiKey: 'phc', fetchImpl, distinctId: (ctx) => `u:${ctx.host}` });
+    const adapter = posthogAdapter({
+      apiKey: 'phc',
+      fetchImpl,
+      distinctId: (ctx) => `u:${ctx.host}`,
+    });
     await adapter.send([event('a')], { beacon: false });
     const body = JSON.parse(fetchImpl.calls[0].init.body as string);
     expect(body.batch[0].properties.distinct_id).toBe('u:chatgpt');

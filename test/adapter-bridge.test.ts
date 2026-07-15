@@ -9,7 +9,11 @@ function event(name: string): TelemetryEvent {
     properties: {},
     timestamp: '2026-07-15T00:00:00.000Z',
     messageId: 'id-1',
-    context: { sessionId: 's', host: 'chatgpt', sdk: { name: 'mcp-widget-telemetry', version: '0' } },
+    context: {
+      sessionId: 's',
+      host: 'chatgpt',
+      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+    },
   };
 }
 

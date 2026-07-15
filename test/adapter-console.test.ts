@@ -8,13 +8,23 @@ function event(name: string, props: Record<string, unknown> = {}): TelemetryEven
     properties: props,
     timestamp: '2026-07-15T00:00:00.000Z',
     messageId: 'id-1',
-    context: { sessionId: 's', host: 'browser', sdk: { name: 'mcp-widget-telemetry', version: '0' } },
+    context: {
+      sessionId: 's',
+      host: 'browser',
+      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+    },
   };
 }
 
 describe('consoleAdapter', () => {
   it('pretty-prints with group + table', () => {
-    const logger = { log: vi.fn(), group: vi.fn(), groupEnd: vi.fn(), table: vi.fn(), warn: vi.fn() };
+    const logger = {
+      log: vi.fn(),
+      group: vi.fn(),
+      groupEnd: vi.fn(),
+      table: vi.fn(),
+      warn: vi.fn(),
+    };
     const adapter = consoleAdapter({ logger });
     adapter.send([event('a', { x: 1 })], { beacon: false });
     expect(logger.group).toHaveBeenCalledTimes(1);
@@ -32,7 +42,11 @@ describe('consoleAdapter', () => {
   it('logs a ready line on init and reports no connect domains', () => {
     const logger = { log: vi.fn() };
     const adapter = consoleAdapter({ logger });
-    adapter.init?.({ sessionId: 's', host: 'browser', sdk: { name: 'mcp-widget-telemetry', version: '0' } });
+    adapter.init?.({
+      sessionId: 's',
+      host: 'browser',
+      sdk: { name: 'mcp-widget-telemetry', version: '0' },
+    });
     expect(logger.log).toHaveBeenCalled();
     expect(adapter.connectDomains).toEqual([]);
   });

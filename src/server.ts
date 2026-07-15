@@ -18,12 +18,7 @@ export { posthogAdapter } from './adapters/posthog';
 
 export { cspMeta, requiredConnectDomains } from './csp';
 
-export type {
-  Adapter,
-  SendOptions,
-  TelemetryContext,
-  TelemetryEvent,
-} from './types';
+export type { Adapter, SendOptions, TelemetryContext, TelemetryEvent } from './types';
 export type { ConsoleAdapterConfig } from './adapters/console';
 export type { WebhookAdapterConfig } from './adapters/webhook';
 export type { PostHogAdapterConfig } from './adapters/posthog';

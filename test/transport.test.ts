@@ -56,7 +56,11 @@ describe('postSimple', () => {
       throw new Error('boom');
     });
     await expect(
-      postSimple('https://x.example/i', 'body', { beacon: true, sendBeaconImpl, fetchImpl: mockFetch() }),
+      postSimple('https://x.example/i', 'body', {
+        beacon: true,
+        sendBeaconImpl,
+        fetchImpl: mockFetch(),
+      }),
     ).resolves.toBeUndefined();
   });
 });

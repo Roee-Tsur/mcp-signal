@@ -16,8 +16,7 @@ export interface ConsoleAdapterConfig {
  */
 export function consoleAdapter(config: ConsoleAdapterConfig = {}): Adapter {
   const logger = (config.logger ?? (typeof console !== 'undefined' ? console : undefined)) as
-    | Console
-    | undefined;
+    Console | undefined;
   const pretty = config.pretty ?? true;
   const label = config.label ?? '[mcp-telemetry]';
 

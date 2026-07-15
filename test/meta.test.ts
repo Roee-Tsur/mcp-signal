@@ -18,7 +18,9 @@ describe('telemetryToolDefinition', () => {
 
   it('includes ChatGPT-legacy compat meta by default and can omit it', () => {
     expect(telemetryToolDefinition()._meta['openai/widgetAccessible']).toBe(true);
-    expect(telemetryToolDefinition({ openaiCompat: false })._meta['openai/widgetAccessible']).toBeUndefined();
+    expect(
+      telemetryToolDefinition({ openaiCompat: false })._meta['openai/widgetAccessible'],
+    ).toBeUndefined();
   });
 
   it('accepts a custom tool name', () => {

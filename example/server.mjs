@@ -35,7 +35,10 @@ function record(via, event) {
     properties: event.properties,
   });
   store.length = Math.min(store.length, 200);
-  console.log(`  [${via}] ${event.event}`, event.properties && Object.keys(event.properties).length ? event.properties : '');
+  console.log(
+    `  [${via}] ${event.event}`,
+    event.properties && Object.keys(event.properties).length ? event.properties : '',
+  );
 }
 
 // The bridge path forwards into a real receiver running the same adapter contract server-side.
@@ -45,11 +48,15 @@ const memoryAdapter = {
     for (const event of batch) record('bridge', event);
   },
 };
-const receiver = createTelemetryReceiver({ adapters: [consoleAdapter({ label: '[server]' }), memoryAdapter] });
+const receiver = createTelemetryReceiver({
+  adapters: [consoleAdapter({ label: '[server]' }), memoryAdapter],
+});
 
 // This is the descriptor a real MCP server would register (app-only, model-invisible).
 const tool = telemetryToolDefinition();
-console.log(`\nRegistered app-only tool "${tool.name}" (visibility: ${JSON.stringify(tool._meta.ui.visibility)})`);
+console.log(
+  `\nRegistered app-only tool "${tool.name}" (visibility: ${JSON.stringify(tool._meta.ui.visibility)})`,
+);
 
 function send(res, status, body, contentType = 'application/json') {
   res.writeHead(status, { 'Content-Type': contentType, 'Cache-Control': 'no-store' });
@@ -81,7 +88,11 @@ const server = createServer(async (req, res) => {
     return serveFile(res, 'index.html', 'text/html; charset=utf-8');
   }
   if (req.method === 'GET' && path === '/mcp-widget-telemetry.global.js') {
-    return serveFile(res, '../dist/mcp-widget-telemetry.global.js', 'text/javascript; charset=utf-8');
+    return serveFile(
+      res,
+      '../dist/mcp-widget-telemetry.global.js',
+      'text/javascript; charset=utf-8',
+    );
   }
   if (req.method === 'GET' && path === '/events') {
     return send(res, 200, JSON.stringify(store));
@@ -121,5 +132,7 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\nmcp-widget-telemetry demo running at  http://localhost:${PORT}`);
-  console.log('Open it, click around, and watch events arrive below (and in your browser console).\n');
+  console.log(
+    'Open it, click around, and watch events arrive below (and in your browser console).\n',
+  );
 });

@@ -52,7 +52,9 @@ export function createTelemetry(config: TelemetryConfig = {}): TelemetryClient {
     try {
       const maybe = adapter.init?.(context);
       if (maybe && typeof (maybe as Promise<void>).then === 'function') {
-        (maybe as Promise<void>).catch((err) => diag.warn(`adapter "${adapter.name}" init failed`, err));
+        (maybe as Promise<void>).catch((err) =>
+          diag.warn(`adapter "${adapter.name}" init failed`, err),
+        );
       }
     } catch (err) {
       diag.warn(`adapter "${adapter.name}" init failed`, err);

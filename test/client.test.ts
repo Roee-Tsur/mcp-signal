@@ -23,7 +23,12 @@ describe('createTelemetry', () => {
 
   it('attaches context, timestamp, and a messageId to every event', async () => {
     const adapter = fakeAdapter();
-    const t = createTelemetry({ ...base, adapters: [adapter], widgetName: 'w', widgetVersion: '2' });
+    const t = createTelemetry({
+      ...base,
+      adapters: [adapter],
+      widgetName: 'w',
+      widgetVersion: '2',
+    });
     t.track('a');
     await t.flush();
     const evt = adapter.sent[0];
