@@ -5,6 +5,14 @@
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](./package.json)
 [![types](https://img.shields.io/badge/types-included-blue.svg)](./dist/index.d.ts)
 
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/Roee-Tsur/mcp-signal/main/assets/demo.gif"
+    alt="mcp-signal in one loop: an event leaves a sandboxed MCP widget, a direct fetch() is blocked by the host CSP, and the same event reaches PostHog through a model-invisible callTool('record_signal') bridge — host → your MCP server → PostHog."
+    width="820"
+  />
+</p>
+
 **Understand how your MCP widgets are actually used.** A tiny, zero-dependency telemetry SDK you
 drop into an interactive MCP widget (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui) to capture usage and
 forward it to any analytics destination — PostHog, a webhook, your console, or an adapter you write.
