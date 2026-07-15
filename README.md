@@ -7,6 +7,7 @@
 **Telemetry for MCP widgets.** Capture how your interactive widget is used inside a sandboxed
 Claude / ChatGPT / mcp-ui host — and forward it anywhere, even past the host CSP.
 
+[![CI](https://img.shields.io/github/actions/workflow/status/Roee-Tsur/mcp-signal/ci.yml?branch=main&style=flat-square&labelColor=1b2130&label=CI)](https://github.com/Roee-Tsur/mcp-signal/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/mcp-signal?style=flat-square&labelColor=1b2130&color=6ea8fe)](https://www.npmjs.com/package/mcp-signal)
 [![min+gzip](https://img.shields.io/badge/min%2Bgzip-5.3_kB-6ea8fe?style=flat-square&labelColor=1b2130)](https://www.npmjs.com/package/mcp-signal)
 [![dependencies](https://img.shields.io/badge/dependencies-0-7ee787?style=flat-square&labelColor=1b2130)](./package.json)

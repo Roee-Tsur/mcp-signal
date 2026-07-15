@@ -1,0 +1,47 @@
+name: Release
+
+# Publish to npm when a GitHub Release is published. Create the release (e.g.
+# `gh release create v0.2.0 --generate-notes`) after bumping the version and
+# updating CHANGELOG.md — this workflow does the actual `npm publish`.
+on:
+  release:
+    types: [published]
+  # Manual escape hatch (re-run a failed publish). Skips the tag/version match check.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # required for npm provenance (the verified badge on npm)
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+      - run: npm ci
+
+      # Guard against publishing a version that doesn't match the release tag.
+      - name: Verify tag matches package.json version
+        if: github.event_name == 'release'
+        run: |
+          set -euo pipefail
+          pkg="$(node -p "require('./package.json').version")"
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$pkg" != "$tag" ]; then
+            echo "::error::package.json version ($pkg) does not match release tag ($tag)"
+            exit 1
+          fi
+          echo "Publishing mcp-signal@$pkg"
+
+      # `npm publish` runs prepublishOnly (typecheck + test + build + package checks),
+      # so the artifact is validated in the same run that signs its provenance.
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

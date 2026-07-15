@@ -1,6 +1,6 @@
 {
   "name": "mcp-signal",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Tiny, zero-dependency, pluggable telemetry SDK for MCP widgets (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui). Capture lifecycle, custom, and error events and forward them to any analytics destination.",
   "keywords": [
     "mcp",
@@ -44,21 +44,46 @@
   "jsdelivr": "./dist/mcp-signal.global.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
     },
     "./inline": {
-      "types": "./dist/inline.d.ts",
-      "import": "./dist/inline.js",
-      "require": "./dist/inline.cjs"
+      "import": {
+        "types": "./dist/inline.d.ts",
+        "default": "./dist/inline.js"
+      },
+      "require": {
+        "types": "./dist/inline.d.cts",
+        "default": "./dist/inline.cjs"
+      }
     },
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "server": [
+        "./dist/server.d.ts"
+      ],
+      "inline": [
+        "./dist/inline.d.ts"
+      ]
+    }
   },
   "files": [
     "dist",
@@ -79,13 +104,17 @@
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check:bundle": "node scripts/check-bundle-leak.mjs",
+    "check:package": "publint --strict && attw --pack .",
     "example": "npm run build && node example/server.mjs",
-    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build && npm run check:bundle && npm run check:package"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@vitest/coverage-v8": "^2.1.9",
     "jsdom": "^25.0.1",
     "prettier": "^3.4.2",
+    "publint": "^0.3.21",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
     "vitest": "^2.1.9"

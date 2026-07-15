@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-07-15
+
+### Fixed
+
+- **Type resolution for CJS and legacy consumers.** The `exports` map now declares per-condition
+  `types` (`.d.cts` for `require`, `.d.ts` for `import`) instead of a single shared declaration, so
+  `require('mcp-signal')` no longer resolves types that masquerade as ESM. Added `typesVersions` so the
+  `mcp-signal/server` and `mcp-signal/inline` subpaths also resolve under legacy `node` module
+  resolution. Verified green across node10 / node16-CJS / node16-ESM / bundler
+  ([`publint`](https://publint.dev) + [`arethetypeswrong`](https://arethetypeswrong.github.io)).
+
 ## [0.2.0] - 2026-07-15
 
 ### Added
@@ -63,5 +74,7 @@ Initial release.
 - **Docs & example** — README, setup/adapters/bridge/writing-an-adapter/privacy/limitations guides,
   and a runnable demo (`npm run example`) that shows events flowing through both transports.
 
+[0.2.1]: https://github.com/Roee-Tsur/mcp-signal/releases/tag/v0.2.1
+[0.2.0]: https://github.com/Roee-Tsur/mcp-signal/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Roee-Tsur/mcp-signal/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Roee-Tsur/mcp-signal/releases/tag/v0.1.0

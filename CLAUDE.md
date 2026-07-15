@@ -12,16 +12,20 @@ a pluggable adapter. Published on npm as [`mcp-signal`](https://www.npmjs.com/pa
 ## Commands
 
 ```bash
-npm test              # vitest (jsdom) — 111 tests
+npm test              # vitest (jsdom) — 122 tests
 npm run test:coverage # v8 coverage (~97%)
 npm run typecheck     # tsc --noEmit
 npm run build         # tsup -> dist/ : ESM + CJS + IIFE + .d.ts
 npm run format        # prettier --write  (format:check to verify)
+npm run check:bundle  # assert no server code leaked into the widget bundles (needs a build)
+npm run check:package # publint --strict && attw --pack . (exports map resolves for every mode)
 npm run example       # build, then serve the demo at http://localhost:8787
 ```
 
 **Before committing, run:** `npm run typecheck && npm test && npm run format:check`. There is no
-pre-commit hook — this gate is manual (and it's what `prepublishOnly` enforces on publish).
+pre-commit hook — this gate is manual, but **GitHub Actions CI** (`.github/workflows/ci.yml`) runs it
+on every push/PR (tests on Node 18/20/22, plus `typecheck` + `format:check` + `build` +
+`check:bundle` + `check:package`). `prepublishOnly` enforces the same gate on publish.
 
 ## Architecture — destinations × transports, one contract
 
@@ -74,8 +78,9 @@ interface Adapter {
   IIFE into `dist/inline.{js,cjs}` via the `postbuild` npm step (nothing generated is committed — `dist`
   is gitignored).
 - Keep server code out of the widget bundle: `src/index.ts` must not import `receiver`/`tool-def`.
-  Verify after a build: `grep -c createSignalReceiver dist/mcp-signal.global.js` → `0` (and the same
-  for `dist/inline.js`, which embeds only the browser IIFE).
+  `npm run check:bundle` (`scripts/check-bundle-leak.mjs`, run in CI) asserts the server symbols
+  `createSignalReceiver`/`signalToolDefinition` are absent from `dist/mcp-signal.global.js` and
+  `dist/inline.{js,cjs}` (the inline builds embed only the browser IIFE). Run it after a build.
 
 ## Invariants (do not break)
 
@@ -134,10 +139,21 @@ that's the whole reason the bridge is the recommended transport. See `docs/bridg
 
 ## Release
 
-1. Bump `version` in `package.json`; add a `CHANGELOG.md` entry.
-2. `npm publish` — runs `prepublishOnly` (`typecheck && test && build`), publishes public/unscoped.
-   The `files` whitelist ships only `dist` + `README.md` + `LICENSE` + `CHANGELOG.md`.
-3. `git tag -a vX.Y.Z -m "..." && git push origin vX.Y.Z` (+ optional `gh release create`).
+Publishing is automated by `.github/workflows/release.yml` (publish-on-Release, with npm
+**provenance**). One-time setup: add an npm **granular/automation access token** as the repo secret
+`NPM_TOKEN` (Settings → Secrets and variables → Actions), and make sure the npm package's publish
+policy permits automation tokens (not interactive-2FA-only).
+
+1. Bump `version` in `package.json`; add a `CHANGELOG.md` entry (+ a `[X.Y.Z]:` link ref).
+2. Commit, then `gh release create vX.Y.Z --generate-notes` (the tag must equal `v<package.json
+version>` — the workflow asserts this).
+3. The workflow runs `npm publish --provenance --access public`, which triggers `prepublishOnly`
+   (`typecheck && test && build && check:bundle && check:package`) so the artifact is validated in the
+   same run that signs its provenance. The `files` whitelist ships only `dist` + `README.md` +
+   `LICENSE` + `CHANGELOG.md`.
+
+Manual fallback (no CI): `npm publish` still works locally and runs the same `prepublishOnly` gate,
+but produces **no provenance** and needs your interactive 2FA OTP. Prefer the Release flow.
 
 Note: the **npm README is snapshotted per version** — README/asset changes appear on npm only after
 the next publish, not on push.
