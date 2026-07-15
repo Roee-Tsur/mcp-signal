@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-07-15
+
+Documentation and repository polish. **No code changes** — the published SDK is identical to
+0.1.0.
+
+### Changed
+
+- README rebuilt on the layout used by leading OSS packages: a centered hero (logo mark, one-line
+  value prop, curated + verified badges, nav links, animated demo), a scannable **Features**
+  section, a dedicated **How the bridge works** diagram section, and a collapsible
+  **Configuration** table.
+
+### Added
+
+- Animated demo (`assets/demo.gif`) at the top of the README and a project logo mark
+  (`assets/logo.png`).
+
 ## [0.1.0] - 2026-07-15
 
 Initial release.
@@ -32,4 +49,5 @@ Initial release.
 - **Docs & example** — README, setup/adapters/bridge/writing-an-adapter/privacy/limitations guides,
   and a runnable demo (`npm run example`) that shows events flowing through both transports.
 
+[0.1.1]: https://github.com/Roee-Tsur/mcp-signal/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Roee-Tsur/mcp-signal/releases/tag/v0.1.0

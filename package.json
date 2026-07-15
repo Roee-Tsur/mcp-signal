@@ -1,6 +1,6 @@
 {
   "name": "mcp-signal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tiny, zero-dependency, pluggable telemetry SDK for MCP widgets (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui). Capture lifecycle, custom, and error events and forward them to any analytics destination.",
   "keywords": [
     "mcp",
