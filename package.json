@@ -1,0 +1,79 @@
+{
+  "name": "mcp-widget-telemetry",
+  "version": "0.1.0",
+  "description": "Tiny, zero-dependency, pluggable telemetry SDK for MCP widgets (Claude MCP Apps, ChatGPT Apps SDK, mcp-ui). Capture lifecycle, custom, and error events and forward them to any analytics destination.",
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "mcp-ui",
+    "chatgpt-apps",
+    "openai-apps",
+    "widget",
+    "telemetry",
+    "analytics",
+    "posthog",
+    "webhook",
+    "observability",
+    "iframe",
+    "sandbox"
+  ],
+  "license": "MIT",
+  "author": "Roee Tsur <tsur.roee@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Roee-Tsur/mcp-widget-telemetry.git"
+  },
+  "homepage": "https://github.com/Roee-Tsur/mcp-widget-telemetry#readme",
+  "bugs": {
+    "url": "https://github.com/Roee-Tsur/mcp-widget-telemetry/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/mcp-widget-telemetry.global.js",
+  "jsdelivr": "./dist/mcp-widget-telemetry.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "example": "npm run build && node example/server.mjs",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.9",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
+  }
+}
